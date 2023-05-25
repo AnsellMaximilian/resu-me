@@ -1,9 +1,10 @@
 "use client";
 
 import client from "@/libs/appwrite";
-import { Account, ID } from "appwrite";
+import { Account, AppwriteException, ID } from "appwrite";
 import React, { FormEventHandler, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
 
 const SignUpPage = () => {
   const router = useRouter();
@@ -23,7 +24,10 @@ const SignUpPage = () => {
         name
       );
       router.push("/");
-    } catch (error) {}
+    } catch (error) {
+      const errorObj = error as AppwriteException;
+      toast.error(errorObj.message);
+    }
   };
   return (
     <div>
@@ -110,7 +114,7 @@ const SignUpPage = () => {
                   <input
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    type="confirm-password"
+                    type="password"
                     name="confirm-password"
                     id="confirm-password"
                     placeholder="••••••••"
@@ -138,6 +142,7 @@ const SignUpPage = () => {
           </div>
         </div>
       </section>
+      <ToastContainer />
     </div>
   );
 };
