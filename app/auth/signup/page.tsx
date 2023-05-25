@@ -31,7 +31,7 @@ const SignUpPage = () => {
         password,
         name
       );
-      router.push("/");
+      router.push("/app");
     } catch (error: any) {
       if (Object.hasOwn(error, "message")) {
         toast.error(error.message);
