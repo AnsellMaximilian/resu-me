@@ -5,6 +5,7 @@ import { Account, AppwriteException, ID } from "appwrite";
 import React, { FormEventHandler, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
+import { AiOutlineLoading3Quarters as Spinner } from "react-icons/ai";
 
 const SignUpPage = () => {
   const router = useRouter();
@@ -12,10 +13,16 @@ const SignUpPage = () => {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
+    if (isLoading) return;
+
     try {
+      setIsLoading(true);
+      if (password !== confirmPassword)
+        throw new Error("Password confirmation does not match");
       const accountClient = new Account(client);
       const newAccount = await accountClient.create(
         ID.unique(),
@@ -24,10 +31,14 @@ const SignUpPage = () => {
         name
       );
       router.push("/");
-    } catch (error) {
-      const errorObj = error as AppwriteException;
-      toast.error(errorObj.message);
+    } catch (error: any) {
+      if (Object.hasOwn(error, "message")) {
+        toast.error(error.message);
+      } else {
+        toast.error("Unknown error");
+      }
     }
+    setIsLoading(false);
   };
   return (
     <div>
@@ -124,9 +135,14 @@ const SignUpPage = () => {
                 </div>
                 <button
                   type="submit"
-                  className="w-full text-white bg-secondary-main hover:bg-secondary-dark focus:ring-4 focus:outline-none focus:ring-secondary-light font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-secondary-main dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  className="relative w-full text-white bg-secondary-main hover:bg-secondary-dark focus:ring-4 focus:outline-none focus:ring-secondary-light font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-secondary-main dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                 >
-                  Create an account
+                  <span>Create an account</span>
+                  {isLoading && (
+                    <div className="absolute inset-y-0 right-0 flex items-center justify-center pr-4">
+                      <Spinner className="animate-spin" />
+                    </div>
+                  )}
                 </button>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                   Already have an account?{" "}
