@@ -21,12 +21,9 @@ const SignUpPage = () => {
     try {
       setIsLoading(true);
       const accountClient = new Account(client);
-      const newAccount = await accountClient.create(
-        ID.unique(),
-        email,
-        password
-      );
-      router.push("/");
+      const session = await accountClient.createEmailSession(email, password);
+
+      router.push("/app");
     } catch (error: any) {
       if (Object.hasOwn(error, "message")) {
         toast.error(error.message);
@@ -52,7 +49,7 @@ const SignUpPage = () => {
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl ">
                 Sign in to your account
               </h1>
-              <form className="space-y-4 md:space-y-6" action="#">
+              <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
                 <div>
                   <label
                     htmlFor="email"
@@ -61,6 +58,8 @@ const SignUpPage = () => {
                     Your email
                   </label>
                   <input
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     type="email"
                     name="email"
                     id="email"
@@ -77,6 +76,8 @@ const SignUpPage = () => {
                     Password
                   </label>
                   <input
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     type="password"
                     name="password"
                     id="password"
@@ -111,9 +112,14 @@ const SignUpPage = () => {
                 </div> */}
                 <button
                   type="submit"
-                  className="w-full text-white bg-secondary-main hover:bg-secondary-dark focus:ring-4 focus:outline-none focus:ring-secondary-light font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                  className="relative w-full text-white bg-secondary-main hover:bg-secondary-dark focus:ring-4 focus:outline-none focus:ring-secondary-light font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                 >
-                  Sign in
+                  <span>Sign in</span>
+                  {isLoading && (
+                    <div className="absolute inset-y-0 right-0 flex items-center justify-center pr-4">
+                      <Spinner className="animate-spin" />
+                    </div>
+                  )}
                 </button>
                 <p className="text-sm font-light text-gray-500">
                   Don’t have an account yet?{" "}
