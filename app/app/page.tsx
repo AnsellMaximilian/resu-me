@@ -7,7 +7,7 @@ import ResumeList from "@/components/ResumeList";
 
 export default function AppPage() {
   return (
-    <div>
+    <div className="p-4">
       <ResumeList />
     </div>
   );
