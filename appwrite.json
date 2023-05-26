@@ -1,0 +1,21 @@
+{
+    "projectId": "646c44980d73371a6ade",
+    "projectName": "Resu-Me",
+    "functions": [
+        {
+            "$id": "64706326d28d9c609089",
+            "name": "uploadResume",
+            "runtime": "node-16.0",
+            "path": "functions/uploadResume",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
+    ]
+}
