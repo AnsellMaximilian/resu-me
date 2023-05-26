@@ -35,12 +35,12 @@ module.exports = async function (req, res) {
       "Environment variables are not set. Function cannot use Appwrite SDK."
     );
   } else {
+    console.log(req.variables["APPWRITE_FUNCTION_JWT"]);
     client
       .setEndpoint(req.variables["APPWRITE_FUNCTION_ENDPOINT"])
       .setProject(req.variables["APPWRITE_FUNCTION_PROJECT_ID"])
       .setKey(req.variables["APPWRITE_FUNCTION_API_KEY"])
-      .setJWT(req.payload.jwt) // Your secret JSON Web Token
-
+      .setJWT(req.variables["APPWRITE_FUNCTION_JWT"]) // Your secret JSON Web Token
       .setSelfSigned(true);
 
     const user = await account.getSession("current");

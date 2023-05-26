@@ -1,14 +1,17 @@
 "use client";
 
-import { storage } from "@/libs/appwrite";
+import useAuth from "@/hooks/useAuth";
+import { account, databases, functions, storage } from "@/libs/appwrite";
 import { ID } from "appwrite";
 import React, { useCallback, FormEventHandler, useState } from "react";
 import { useDropzone, DropEvent, FileRejection } from "react-dropzone";
 import { ToastContainer, toast } from "react-toastify";
+import { v4 as uuidv4 } from "uuid";
 
 export default function UploadResumePage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const { currentAccount } = useAuth();
 
   // FILE HANDLING
   const handleOnFileChosen: <T extends File>(
@@ -37,14 +40,26 @@ export default function UploadResumePage() {
       if (acceptedFiles.length <= 0)
         throw new Error("Please select a resume file.");
 
+      if (!currentAccount) throw new Error("Please log in.");
+
+      const id = uuidv4();
+
       const file = await storage.createFile(
         process.env.NEXT_PUBLIC_BUCKED_ID as string,
-        ID.unique(),
+        id,
         acceptedFiles[0]
+      );
+
+      const resume = await databases.createDocument(
+        process.env.NEXT_PUBLIC_DATABASE_ID as string,
+        process.env.NEXT_PUBLIC_RESUME_COLLECTION_ID as string,
+        id,
+        { title, description, userId: currentAccount.$id }
       );
 
       toast.success("Resume uploaded.");
     } catch (error: any) {
+      console.log(error);
       if (Object.hasOwn(error, "message")) {
         toast.error(error.message);
       } else {
@@ -60,7 +75,7 @@ export default function UploadResumePage() {
           <h2 className="mb-4 text-xl font-bold text-gray-900">
             Upload Resume
           </h2>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} encType="multipart/form-data">
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
               <div className="sm:col-span-2">
                 <label
