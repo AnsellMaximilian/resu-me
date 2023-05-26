@@ -26,10 +26,7 @@ export default function AppHeader() {
             </ul>
           </div>
         </div>
-        <button
-          onClick={logout}
-          className="bg-secondary-main text-white px-4 py-1 rounded-md hover:bg-secondary-dark text-sm"
-        >
+        <button onClick={logout} className="text-sm primary-btn">
           Logout
         </button>
       </nav>
