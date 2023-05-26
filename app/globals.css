@@ -24,4 +24,12 @@
   .primary-btn {
     @apply text-white bg-secondary-main hover:bg-secondary-dark focus:outline-none focus:ring-4 focus:ring-secondary-light font-medium rounded-full px-4 py-1.5;
   }
+
+  .head-text {
+    @apply uppercase font-bold text-xl;
+  }
+
+  .input {
+    @apply bg-gray-50 border border-gray-300 focus:ring-1 text-gray-900 sm:text-sm rounded-lg focus:outline-none focus:ring-secondary-main focus:border-secondary-main block w-full p-2.5;
+  }
 }

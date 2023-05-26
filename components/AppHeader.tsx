@@ -18,7 +18,7 @@ export default function AppHeader() {
                 <ActiveLink label="Dashboard" href="/app" />
               </li>
               <li>
-                <ActiveLink label="Resume" href="/app/resume" />
+                <ActiveLink label="Resume" href="/app/resumes" />
               </li>
               <li>
                 <ActiveLink label="Groups" href="/app/groups" />
