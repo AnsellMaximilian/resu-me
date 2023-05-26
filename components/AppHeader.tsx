@@ -8,8 +8,8 @@ import ActiveLink from "./ActiveLink";
 export default function AppHeader() {
   const { currentAccount, logout } = useAuth();
   return (
-    <header className="py-3 px-4 shadow-md">
-      <nav className="flex justify-between items-center">
+    <header className="h-12 px-4 shadow-md flex items-center fixed top-0 inset-x-0">
+      <nav className="flex justify-between items-center w-full">
         <div className="flex gap-8 items-center">
           <div className="font-bold text-lg">Resu-Me</div>
           <div>
