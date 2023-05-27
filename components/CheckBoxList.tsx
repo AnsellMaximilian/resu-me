@@ -1,4 +1,9 @@
-import React, { useState, useEffect, ChangeEventHandler } from "react";
+import React, {
+  useState,
+  useEffect,
+  ChangeEventHandler,
+  FormEventHandler,
+} from "react";
 
 interface Checkbox<T> {
   key: string;
@@ -20,6 +25,11 @@ export default function CheckBoxList<T>({
   renderLabel,
 }: CheckboxListProps<T>) {
   const [checkboxes, setCheckboxes] = useState<Checkbox<T>[]>([]);
+
+  // Custom values
+  const [customValue, setCustomValue] = useState("");
+
+  const onCustomSubmit: FormEventHandler<HTMLFormElement> = (e) => {};
 
   useEffect(() => {
     (async () => {
@@ -53,38 +63,51 @@ export default function CheckBoxList<T>({
     check(checkbox);
 
   return (
-    <ul className="flex flex-wrap gap-2">
-      {checkboxes.map((checkbox) => {
-        return (
-          <li key={renderKey(checkbox.item)}>
-            <label
-              htmlFor={renderId(checkbox.item)}
-              className="hidden mb-2 text-sm font-medium text-gray-900"
-            >
-              {renderLabel(checkbox.item)}
-            </label>
-            <input
-              checked={checkbox.checked}
-              onChange={handleOnChange(checkbox)}
-              type="checkbox"
-              name={renderLabel(checkbox.item)}
-              id={renderId(checkbox.item)}
-              className="hidden"
-            />
-            <button
-              type="button"
-              className={
-                (checkbox.checked
-                  ? "checkbox-toggle--checked"
-                  : "checkbox-toggle") + " cursor-pointer"
-              }
-              onClick={handleClick(checkbox)}
-            >
-              {renderLabel(checkbox.item)}
-            </button>
-          </li>
-        );
-      })}
-    </ul>
+    <div>
+      <ul className="flex flex-wrap gap-2 mb-4">
+        {checkboxes.map((checkbox) => {
+          return (
+            <li key={renderKey(checkbox.item)}>
+              <label
+                htmlFor={renderId(checkbox.item)}
+                className="hidden mb-2 text-sm font-medium text-gray-900"
+              >
+                {renderLabel(checkbox.item)}
+              </label>
+              <input
+                checked={checkbox.checked}
+                onChange={handleOnChange(checkbox)}
+                type="checkbox"
+                name={renderLabel(checkbox.item)}
+                id={renderId(checkbox.item)}
+                className="hidden"
+              />
+              <button
+                type="button"
+                className={
+                  (checkbox.checked
+                    ? "checkbox-toggle--checked"
+                    : "checkbox-toggle") + " cursor-pointer"
+                }
+                onClick={handleClick(checkbox)}
+              >
+                {renderLabel(checkbox.item)}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+      <form>
+        <input
+          onChange={(e) => setCustomValue(e.target.value)}
+          value={customValue}
+          type="text"
+          name="customValue"
+          id="customValue"
+          className="input rounded-full text-xs py-2"
+          placeholder="Type and press enter to add custom values"
+        />
+      </form>
+    </div>
   );
 }
