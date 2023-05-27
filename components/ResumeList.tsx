@@ -59,7 +59,7 @@ export default function ResumeList() {
         <ul className="flex gap-4 flex-wrap">
           {resumes.map((resume) => (
             <li key={resume.$id}>
-              <div className="bg-white shadow-md rounded-md border-gray-300 border flex gap-4 items-center justify-between p-4 w-64 h-24">
+              <div className="bg-white shadow-md rounded-md border-gray-300 border flex gap-4 items-center justify-start p-4 w-64 h-24">
                 <div>
                   {resume.file ? (
                     resume.file.mimeType === "application/pdf" ? (
