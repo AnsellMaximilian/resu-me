@@ -56,10 +56,10 @@ export default function ResumeList() {
         </Link>
       </header>
       {resumes.length > 0 && (
-        <ul className="flex gap-4">
+        <ul className="flex gap-4 flex-wrap">
           {resumes.map((resume) => (
             <li key={resume.$id}>
-              <div className="bg-white p-4 shadow-md rounded-md border-gray-300 border flex gap-4 items-center justify-between">
+              <div className="bg-white shadow-md rounded-md border-gray-300 border flex gap-4 items-center justify-between p-4 w-64 h-24">
                 <div>
                   {resume.file ? (
                     resume.file.mimeType === "application/pdf" ? (
@@ -71,17 +71,17 @@ export default function ResumeList() {
                     <div>No File.</div>
                   )}
                 </div>
-                <div>
-                  <div className="text-md text-secondary-main font-bold">
+                <div className="whitespace-nowrap overflow-hidden">
+                  <div className="text-md text-secondary-main font-bold text-ellipsis overflow-hidden">
                     {resume.title}
                   </div>
-                  <div className="text-sm">
+                  <div className="text-sm text-ellipsis overflow-hidden">
                     {resume.description
                       ? resume.description
                       : "No description."}
                   </div>
-                  <div className="text-xs text-gray-400">
-                    {resume?.file?.name}
+                  <div className="text-xs text-gray-400 text-ellipsis overflow-hidden">
+                    File: {resume?.file?.name}
                   </div>
                 </div>
               </div>
