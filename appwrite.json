@@ -16,6 +16,21 @@
             "events": [],
             "schedule": "",
             "timeout": 15
+        },
+        {
+            "$id": "6471c57b9b02bca3117d",
+            "name": "submitCustomSkill",
+            "runtime": "node-16.0",
+            "path": "functions/submitCustomSkill",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
         }
     ]
 }
