@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEventHandler } from "react";
 
 interface Checkbox<T> {
   key: string;
@@ -24,12 +24,33 @@ export default function CheckBoxList<T>({
   useEffect(() => {
     (async () => {
       const checkboxes: Checkbox<T>[] = items.map((item) => {
-        return { checked: false, item } as Checkbox<T>;
+        return { checked: false, item, key: renderKey(item) } as Checkbox<T>;
       });
 
       setCheckboxes(checkboxes);
     })();
-  }, [items]);
+  }, [items, renderKey]);
+
+  const check = (checkbox: Checkbox<T>) =>
+    setCheckboxes((prev) =>
+      prev.map((prevCheckbox) => {
+        const newState = { ...prevCheckbox };
+        if (checkbox.key === prevCheckbox.key) {
+          newState.checked = !prevCheckbox.checked;
+        }
+        return newState;
+      })
+    );
+
+  const handleOnChange: (
+    checkbox: Checkbox<T>
+  ) => ChangeEventHandler<HTMLInputElement> = (checkbox) => (e) =>
+    check(checkbox);
+
+  const handleClick: (
+    checkbox: Checkbox<T>
+  ) => React.MouseEventHandler<HTMLButtonElement> = (checkbox) => (e) =>
+    check(checkbox);
 
   return (
     <ul className="flex flex-wrap gap-2">
@@ -44,31 +65,23 @@ export default function CheckBoxList<T>({
             </label>
             <input
               checked={checkbox.checked}
-              onChange={(e) =>
-                setCheckboxes((prev) =>
-                  prev.map((prevCheckbox) => {
-                    const newState = { ...prevCheckbox };
-                    if (checkbox.key === prevCheckbox.key) {
-                      newState.checked = !prevCheckbox.checked;
-                    }
-                    return newState;
-                  })
-                )
-              }
+              onChange={handleOnChange(checkbox)}
               type="checkbox"
               name={renderLabel(checkbox.item)}
               id={renderId(checkbox.item)}
               className="hidden"
             />
-            <div
+            <button
+              type="button"
               className={
                 (checkbox.checked
                   ? "checkbox-toggle--checked"
                   : "checkbox-toggle") + " cursor-pointer"
               }
+              onClick={handleClick(checkbox)}
             >
               {renderLabel(checkbox.item)}
-            </div>
+            </button>
           </li>
         );
       })}

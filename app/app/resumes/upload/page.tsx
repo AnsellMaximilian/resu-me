@@ -1,5 +1,6 @@
 "use client";
 
+import CheckBoxList from "@/components/CheckBoxList";
 import useAuth from "@/hooks/useAuth";
 import { account, databases, functions, storage } from "@/libs/appwrite";
 import { ID, Models } from "appwrite";
@@ -17,16 +18,11 @@ interface Skill extends Models.Document {
   name: string;
 }
 
-interface SkillCheckBox {
-  skill: Skill;
-  checked: boolean;
-}
-
 export default function UploadResumePage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const { currentAccount } = useAuth();
-  const [skillCheckboxes, setSkillCheckboxes] = useState<SkillCheckBox[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -35,15 +31,13 @@ export default function UploadResumePage() {
         process.env.NEXT_PUBLIC_SKILL_COLLECTION_ID as string
       );
 
-      const skillCheckboxes: SkillCheckBox[] = skillDocuments.documents.map(
-        (doc) => {
-          const skill = { ...doc };
-          skill.name = doc.name as string;
-          return { checked: false, skill } as SkillCheckBox;
-        }
-      );
+      const skills: Skill[] = skillDocuments.documents.map((doc) => {
+        const skill = { ...doc };
+        skill.name = doc.name as string;
+        return skill as Skill;
+      });
 
-      setSkillCheckboxes(skillCheckboxes);
+      setSkills(skills);
     })();
   }, []);
 
@@ -182,50 +176,15 @@ export default function UploadResumePage() {
             <div className="col-span-12 md:col-span-6">
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 col-span-12 md:col-span-6">
                 <div className="sm:col-span-2">
-                  <ul className="flex flex-wrap gap-2">
-                    {skillCheckboxes.map((checkbox) => {
-                      return (
-                        <li key={checkbox.skill.$id}>
-                          <label
-                            htmlFor={checkbox.skill.name + checkbox.skill.$id}
-                            className="hidden mb-2 text-sm font-medium text-gray-900"
-                          >
-                            {checkbox.skill.name}
-                          </label>
-                          <input
-                            checked={checkbox.checked}
-                            onChange={(e) =>
-                              setSkillCheckboxes((prev) =>
-                                prev.map((prevCheckbox) => {
-                                  const newState = { ...prevCheckbox };
-                                  if (
-                                    checkbox.skill.$id ===
-                                    prevCheckbox.skill.$id
-                                  ) {
-                                    newState.checked = !prevCheckbox.checked;
-                                  }
-                                  return newState;
-                                })
-                              )
-                            }
-                            type="checkbox"
-                            name={checkbox.skill.name}
-                            id={checkbox.skill.name + checkbox.skill.$id}
-                            className="hidden"
-                          />
-                          <div
-                            className={
-                              (checkbox.checked
-                                ? "checkbox-toggle--checked"
-                                : "checkbox-toggle") + " cursor-pointer"
-                            }
-                          >
-                            {checkbox.skill.name}
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
+                  <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Skills
+                  </div>
+                  <CheckBoxList
+                    items={skills}
+                    renderId={(skill) => skill.name + skill.$id}
+                    renderKey={(skill) => skill.$id}
+                    renderLabel={(skill) => skill.name}
+                  />
                 </div>
                 <div className="sm:col-span-2">
                   <label
