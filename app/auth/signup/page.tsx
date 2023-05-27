@@ -1,6 +1,6 @@
 "use client";
 
-import client from "@/libs/appwrite";
+import client, { account } from "@/libs/appwrite";
 import { Account, AppwriteException, ID } from "appwrite";
 import React, { FormEventHandler, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -31,6 +31,7 @@ const SignUpPage = () => {
         password,
         name
       );
+      await account.createEmailSession(email, password);
       router.push("/app");
     } catch (error: any) {
       if (Object.hasOwn(error, "message")) {
