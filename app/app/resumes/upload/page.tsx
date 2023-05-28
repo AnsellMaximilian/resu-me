@@ -1,6 +1,6 @@
 "use client";
 
-import CheckBoxList from "@/components/CheckBoxList";
+import CheckBoxList, { Checkbox } from "@/components/CheckBoxList";
 import useAuth from "@/hooks/useAuth";
 import { account, databases, functions, storage } from "@/libs/appwrite";
 import { ID, Models, Query } from "appwrite";
@@ -22,7 +22,7 @@ export default function UploadResumePage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const { currentAccount } = useAuth();
-  const [skills, setSkills] = useState<Skill[]>([]);
+  const [skillCheckboxes, setSkillCheckboxes] = useState<Checkbox<Skill>[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -34,7 +34,13 @@ export default function UploadResumePage() {
         )
       ).documents as Skill[];
 
-      setSkills(skills);
+      const skillCheckboxes: Checkbox<Skill>[] = skills.map((skill) => ({
+        key: skill.$id,
+        item: skill,
+        checked: false,
+      }));
+
+      setSkillCheckboxes(skillCheckboxes);
     })();
   }, []);
 
@@ -177,10 +183,11 @@ export default function UploadResumePage() {
                     Skills
                   </div>
                   <CheckBoxList
-                    items={skills}
-                    renderId={(skill) => skill.name + skill.$id}
-                    renderKey={(skill) => skill.$id}
-                    renderLabel={(skill) => skill.name}
+                    items={skillCheckboxes}
+                    renderId={(checkbox) =>
+                      checkbox.item.name + checkbox.item.$id
+                    }
+                    renderLabel={(checkbox) => checkbox.item.name}
                     handleCustomValueSubmit={async (customValue) => {
                       const skillResponse = await functions.createExecution(
                         process.env
@@ -188,12 +195,14 @@ export default function UploadResumePage() {
                         JSON.stringify({ name: customValue })
                       );
                       const skill = JSON.parse(skillResponse.response) as Skill;
-                      return {
-                        item: skill,
+                      const skillCheckbox: Checkbox<Skill> = {
                         key: skill.$id,
+                        item: skill,
                         checked: false,
                       };
+                      setSkillCheckboxes((prev) => [...prev, skillCheckbox]);
                     }}
+                    setCheckboxes={setSkillCheckboxes}
                   />
                 </div>
               </div>

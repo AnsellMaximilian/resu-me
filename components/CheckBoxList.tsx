@@ -11,22 +11,20 @@ export interface Checkbox<T> {
 }
 
 interface CheckboxListProps<T> {
-  items: T[];
-  renderKey: (item: T) => string;
-  renderId: (item: T) => string;
-  renderLabel: (item: T) => string;
-  handleCustomValueSubmit: (name: string) => Promise<Checkbox<T>>;
+  items: Checkbox<T>[];
+  renderId: (item: Checkbox<T>) => string;
+  renderLabel: (item: Checkbox<T>) => string;
+  handleCustomValueSubmit: (name: string) => void;
+  setCheckboxes: React.Dispatch<React.SetStateAction<Checkbox<T>[]>>;
 }
 
 export default function CheckBoxList<T>({
   items,
-  renderKey,
   renderId,
   renderLabel,
   handleCustomValueSubmit,
+  setCheckboxes,
 }: CheckboxListProps<T>) {
-  const [checkboxes, setCheckboxes] = useState<Checkbox<T>[]>([]);
-
   // Custom values
   const [customValue, setCustomValue] = useState("");
 
@@ -37,27 +35,15 @@ export default function CheckBoxList<T>({
       e.preventDefault(); // Prevent form submission
       if (!customValue) return;
       // Check if it already exists
-      if (checkboxes.find((box) => renderLabel(box.item) === customValue)) {
+      if (items.find((box) => renderLabel(box) === customValue)) {
         toast.error("That value already exists.");
         return;
       }
       setCustomValue("");
 
       const newItem = await handleCustomValueSubmit(customValue);
-
-      setCheckboxes((prev) => [...prev, newItem]);
     }
   };
-
-  useEffect(() => {
-    (async () => {
-      const checkboxes: Checkbox<T>[] = items.map((item) => {
-        return { checked: false, item, key: renderKey(item) } as Checkbox<T>;
-      });
-
-      setCheckboxes(checkboxes);
-    })();
-  }, [items, renderKey]);
 
   const check = (checkbox: Checkbox<T>) =>
     setCheckboxes((prev) =>
@@ -83,21 +69,21 @@ export default function CheckBoxList<T>({
   return (
     <div>
       <ul className="flex flex-wrap gap-2 mb-4">
-        {checkboxes.map((checkbox) => {
+        {items.map((checkbox) => {
           return (
-            <li key={renderKey(checkbox.item)}>
+            <li key={checkbox.key}>
               <label
-                htmlFor={renderId(checkbox.item)}
+                htmlFor={renderId(checkbox)}
                 className="hidden mb-2 text-sm font-medium text-gray-900"
               >
-                {renderLabel(checkbox.item)}
+                {renderLabel(checkbox)}
               </label>
               <input
                 checked={checkbox.checked}
                 onChange={handleOnChange(checkbox)}
                 type="checkbox"
-                name={renderLabel(checkbox.item)}
-                id={renderId(checkbox.item)}
+                name={renderLabel(checkbox)}
+                id={renderId(checkbox)}
                 className="hidden"
               />
               <button
@@ -109,7 +95,7 @@ export default function CheckBoxList<T>({
                 }
                 onClick={handleClick(checkbox)}
               >
-                {renderLabel(checkbox.item)}
+                {renderLabel(checkbox)}
               </button>
             </li>
           );
