@@ -81,7 +81,9 @@ export default function UploadResumePage() {
         acceptedFiles[0]
       );
 
-      const selectedSkillIds = skillCheckboxes.map((box) => box.item.$id);
+      const selectedSkillIds = skillCheckboxes
+        .filter((box) => box.checked)
+        .map((box) => box.item.$id);
 
       const resume = await databases.createDocument(
         process.env.NEXT_PUBLIC_DATABASE_ID as string,
