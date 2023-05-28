@@ -9,6 +9,8 @@ import {
   FaFilePdf as PDF,
   FaFileWord as Word,
 } from "react-icons/fa";
+import ResumeCard from "./ResumeCard";
+import { toast } from "react-toastify";
 
 export type Resume = Models.Document & {
   title: string;
@@ -44,6 +46,28 @@ export default function ResumeList() {
     })();
   }, []);
 
+  const handleDelete = async (resumeId: string) => {
+    try {
+      await databases.deleteDocument(
+        process.env.NEXT_PUBLIC_DATABASE_ID as string,
+        process.env.NEXT_PUBLIC_RESUME_COLLECTION_ID as string,
+        resumeId
+      );
+
+      await storage.deleteFile(
+        process.env.NEXT_PUBLIC_BUCKED_ID as string,
+        resumeId
+      );
+      setResumes((prev) => prev.filter((res) => res.$id !== resumeId));
+      toast.success(`Deleted resume of id ${resumeId}`);
+      return true;
+    } catch (error) {
+      toast.error(`Failed to delete.`);
+
+      return false;
+    }
+  };
+
   return (
     <section>
       <header className="flex justify-between items-end mb-4">
@@ -58,34 +82,11 @@ export default function ResumeList() {
       {resumes.length > 0 && (
         <ul className="flex gap-4 flex-wrap">
           {resumes.map((resume) => (
-            <li key={resume.$id}>
-              <div className="bg-white shadow-md rounded-md border-gray-300 border flex gap-4 items-center justify-start p-4 w-64 h-24">
-                <div>
-                  {resume.file ? (
-                    resume.file.mimeType === "application/pdf" ? (
-                      <PDF className="text-red-600" size={42} />
-                    ) : (
-                      <Word className="text-blue-800" size={42} />
-                    )
-                  ) : (
-                    <div>No File.</div>
-                  )}
-                </div>
-                <div className="whitespace-nowrap overflow-hidden">
-                  <div className="text-md text-secondary-main font-bold text-ellipsis overflow-hidden">
-                    {resume.title}
-                  </div>
-                  <div className="text-sm text-ellipsis overflow-hidden">
-                    {resume.description
-                      ? resume.description
-                      : "No description."}
-                  </div>
-                  <div className="text-xs text-gray-400 text-ellipsis overflow-hidden">
-                    File: {resume?.file?.name}
-                  </div>
-                </div>
-              </div>
-            </li>
+            <ResumeCard
+              key={resume.$id}
+              resume={resume}
+              handleDelete={handleDelete}
+            />
           ))}
         </ul>
       )}
