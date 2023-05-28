@@ -81,11 +81,18 @@ export default function UploadResumePage() {
         acceptedFiles[0]
       );
 
+      const selectedSkillIds = skillCheckboxes.map((box) => box.item.$id);
+
       const resume = await databases.createDocument(
         process.env.NEXT_PUBLIC_DATABASE_ID as string,
         process.env.NEXT_PUBLIC_RESUME_COLLECTION_ID as string,
         id,
-        { title, description, userId: currentAccount.$id }
+        {
+          title,
+          description,
+          userId: currentAccount.$id,
+          skillIds: selectedSkillIds,
+        }
       );
 
       toast.success("Resume uploaded.");
