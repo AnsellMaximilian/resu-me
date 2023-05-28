@@ -3,6 +3,7 @@
 import { functions } from "@/libs/appwrite";
 import React, { useState, useEffect, ChangeEventHandler } from "react";
 import { toast } from "react-toastify";
+import Spinner from "./Spinner";
 
 export interface Checkbox<T> {
   key: string;
@@ -14,7 +15,7 @@ interface CheckboxListProps<T> {
   items: Checkbox<T>[];
   renderId: (item: Checkbox<T>) => string;
   renderLabel: (item: Checkbox<T>) => string;
-  handleCustomValueSubmit: (name: string) => void;
+  handleCustomValueSubmit: (name: string) => Promise<boolean>;
   setCheckboxes: React.Dispatch<React.SetStateAction<Checkbox<T>[]>>;
 }
 
@@ -27,12 +28,14 @@ export default function CheckBoxList<T>({
 }: CheckboxListProps<T>) {
   // Custom values
   const [customValue, setCustomValue] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const onCustomSubmit: React.KeyboardEventHandler<HTMLInputElement> = async (
     e
   ) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !submitting) {
       e.preventDefault(); // Prevent form submission
+      setSubmitting(true);
       if (!customValue) return;
       // Check if it already exists
       if (items.find((box) => renderLabel(box) === customValue)) {
@@ -41,7 +44,8 @@ export default function CheckBoxList<T>({
       }
       setCustomValue("");
 
-      const newItem = await handleCustomValueSubmit(customValue);
+      const success = await handleCustomValueSubmit(customValue);
+      setSubmitting(false);
     }
   };
 
@@ -101,7 +105,7 @@ export default function CheckBoxList<T>({
           );
         })}
       </ul>
-      <div>
+      <div className="relative">
         <input
           onChange={(e) => setCustomValue(e.target.value)}
           value={customValue}
@@ -112,6 +116,7 @@ export default function CheckBoxList<T>({
           placeholder="Type and press enter to add custom values"
           onKeyDown={onCustomSubmit}
         />
+        {submitting && <Spinner />}
       </div>
     </div>
   );

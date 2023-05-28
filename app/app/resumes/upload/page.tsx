@@ -189,18 +189,25 @@ export default function UploadResumePage() {
                     }
                     renderLabel={(checkbox) => checkbox.item.name}
                     handleCustomValueSubmit={async (customValue) => {
-                      const skillResponse = await functions.createExecution(
-                        process.env
-                          .NEXT_PUBLIC_FUNCTION_ID_SUMBIT_CUSTOM_SKILL as string,
-                        JSON.stringify({ name: customValue })
-                      );
-                      const skill = JSON.parse(skillResponse.response) as Skill;
-                      const skillCheckbox: Checkbox<Skill> = {
-                        key: skill.$id,
-                        item: skill,
-                        checked: false,
-                      };
-                      setSkillCheckboxes((prev) => [...prev, skillCheckbox]);
+                      try {
+                        const skillResponse = await functions.createExecution(
+                          process.env
+                            .NEXT_PUBLIC_FUNCTION_ID_SUMBIT_CUSTOM_SKILL as string,
+                          JSON.stringify({ name: customValue })
+                        );
+                        const skill = JSON.parse(
+                          skillResponse.response
+                        ) as Skill;
+                        const skillCheckbox: Checkbox<Skill> = {
+                          key: skill.$id,
+                          item: skill,
+                          checked: false,
+                        };
+                        setSkillCheckboxes((prev) => [...prev, skillCheckbox]);
+                        return true;
+                      } catch (error) {
+                        return false;
+                      }
                     }}
                     setCheckboxes={setSkillCheckboxes}
                   />
