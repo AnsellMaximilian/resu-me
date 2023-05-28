@@ -1,9 +1,11 @@
 "use client";
 
 import CheckBoxList, { Checkbox } from "@/components/CheckBoxList";
+import Spinner from "@/components/Spinner";
 import useAuth from "@/hooks/useAuth";
 import { account, databases, functions, storage } from "@/libs/appwrite";
 import { ID, Models, Query } from "appwrite";
+import { useRouter } from "next/navigation";
 import React, {
   useCallback,
   FormEventHandler,
@@ -19,6 +21,8 @@ interface Skill extends Models.Document {
 }
 
 export default function UploadResumePage() {
+  const router = useRouter();
+  const [submitting, setSubmitting] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const { currentAccount } = useAuth();
@@ -66,6 +70,7 @@ export default function UploadResumePage() {
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
       if (!title) throw new Error("Title field is required.");
       if (acceptedFiles.length <= 0)
@@ -97,6 +102,8 @@ export default function UploadResumePage() {
         }
       );
 
+      router.push("/app");
+
       toast.success("Resume uploaded.");
     } catch (error: any) {
       console.log(error);
@@ -105,6 +112,8 @@ export default function UploadResumePage() {
       } else {
         toast.error("Unknown error");
       }
+    } finally {
+      setSubmitting(false);
     }
   };
   return (
@@ -227,9 +236,14 @@ export default function UploadResumePage() {
             <div className="col-span-12">
               <button
                 type="submit"
-                className="inline-flex items-center px-5 py-2.5 text-sm primary-btn"
+                disabled={submitting}
+                className={
+                  "inline-flex items-center px-5 py-2.5 text-sm primary-btn relative max-w-full w-28 " +
+                  (submitting ? "justify-start" : "justify-center")
+                }
               >
-                Upload
+                <span>Upload</span>
+                {submitting && <Spinner />}
               </button>
             </div>
           </form>
