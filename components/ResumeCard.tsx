@@ -7,7 +7,9 @@ import {
 } from "react-icons/fa";
 
 import { RiMoreLine } from "react-icons/ri";
+import { ImArrowDown as Download } from "react-icons/im";
 import { Menu } from "@headlessui/react";
+import { storage } from "@/libs/appwrite";
 
 export default function ResumeCard({
   resume,
@@ -30,6 +32,21 @@ export default function ResumeCard({
             >
               <Trash size={10} className="text-gray-600" /> Delete
             </button>
+          </Menu.Item>
+          <Menu.Item>
+            <a
+              download
+              //   target="_blank"
+              className="flex gap-2 items-center px-3 py-2 hover:text-black transition-all duration-100 w-full text-left hover:bg-primary-main"
+              href={
+                storage.getFileDownload(
+                  process.env.NEXT_PUBLIC_BUCKED_ID as string,
+                  resume.$id
+                ).href
+              }
+            >
+              <Download size={10} className="text-gray-600" /> Download
+            </a>
           </Menu.Item>
         </Menu.Items>
       </Menu>
