@@ -3,7 +3,7 @@
 import CheckBoxList from "@/components/CheckBoxList";
 import useAuth from "@/hooks/useAuth";
 import { account, databases, functions, storage } from "@/libs/appwrite";
-import { ID, Models } from "appwrite";
+import { ID, Models, Query } from "appwrite";
 import React, {
   useCallback,
   FormEventHandler,
@@ -26,16 +26,13 @@ export default function UploadResumePage() {
 
   useEffect(() => {
     (async () => {
-      const skillDocuments = await databases.listDocuments(
-        process.env.NEXT_PUBLIC_DATABASE_ID as string,
-        process.env.NEXT_PUBLIC_SKILL_COLLECTION_ID as string
-      );
-
-      const skills: Skill[] = skillDocuments.documents.map((doc) => {
-        const skill = { ...doc };
-        skill.name = doc.name as string;
-        return skill as Skill;
-      });
+      const skills = (
+        await databases.listDocuments(
+          process.env.NEXT_PUBLIC_DATABASE_ID as string,
+          process.env.NEXT_PUBLIC_SKILL_COLLECTION_ID as string,
+          [Query.equal("approved", true)]
+        )
+      ).documents as Skill[];
 
       setSkills(skills);
     })();
@@ -184,54 +181,20 @@ export default function UploadResumePage() {
                     renderId={(skill) => skill.name + skill.$id}
                     renderKey={(skill) => skill.$id}
                     renderLabel={(skill) => skill.name}
+                    handleCustomValueSubmit={async (customValue) => {
+                      const skillResponse = await functions.createExecution(
+                        process.env
+                          .NEXT_PUBLIC_FUNCTION_ID_SUMBIT_CUSTOM_SKILL as string,
+                        JSON.stringify({ name: customValue })
+                      );
+                      const skill = JSON.parse(skillResponse.response) as Skill;
+                      return {
+                        item: skill,
+                        key: skill.$id,
+                        checked: false,
+                      };
+                    }}
                   />
-                </div>
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="description"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Description
-                  </label>
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    id="description"
-                    rows={8}
-                    className="input"
-                    placeholder="Your description here"
-                  ></textarea>
-                </div>
-                <div className="sm:col-span-2">
-                  <label
-                    className="block mb-2 text-sm font-medium text-gray-900"
-                    htmlFor="file_input"
-                  >
-                    Upload Resume File
-                  </label>
-                  <div
-                    {...getRootProps({
-                      className:
-                        "input text-gray-400 h-16 flex items-center border-dashed",
-                    })}
-                  >
-                    <input {...getInputProps()} />
-                    {isDragActive ? (
-                      <p>Drop the resume file here ...</p>
-                    ) : (
-                      <p>
-                        {acceptedFiles.length > 0
-                          ? `File Chosen: ${acceptedFiles[0].name}`
-                          : "Drag and drop some your resume file here, or click to browse."}
-                      </p>
-                    )}
-                  </div>
-                  <p
-                    className="mt-1 text-sm text-gray-500"
-                    id="file_input_help"
-                  >
-                    PDF, DOC, or DOCX (MAX. 400 MB).
-                  </p>
                 </div>
               </div>
             </div>
