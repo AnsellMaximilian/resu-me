@@ -16,15 +16,15 @@ import { useDropzone, DropEvent, FileRejection } from "react-dropzone";
 import { ToastContainer, toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
 
-interface Skill extends Models.Document {
+export interface Skill extends Models.Document {
   name: string;
 }
 
-interface Industry extends Models.Document {
+export interface Industry extends Models.Document {
   name: string;
 }
 
-interface Role extends Models.Document {
+export interface Role extends Models.Document {
   name: string;
 }
 
@@ -101,7 +101,6 @@ export default function UploadResumePage() {
     event: DropEvent
   ) => void = useCallback((acceptedFiles) => {
     // Do something with the files
-    console.log(acceptedFiles);
   }, []);
   const { acceptedFiles, getRootProps, getInputProps, isDragActive } =
     useDropzone({
@@ -127,7 +126,7 @@ export default function UploadResumePage() {
       const id = uuidv4();
 
       const file = await storage.createFile(
-        process.env.NEXT_PUBLIC_BUCKED_ID as string,
+        process.env.NEXT_PUBLIC_BUCKET_ID as string,
         id,
         acceptedFiles[0]
       );
