@@ -16,7 +16,9 @@ export type Resume = Models.Document & {
   title: string;
   description: string;
   userId: string;
-  test: Models.Document;
+  skillIds: string[];
+  roleIds: string[];
+  industryIds: string[];
   file: Models.File | null;
 };
 
@@ -30,7 +32,7 @@ export default function ResumeList() {
         process.env.NEXT_PUBLIC_RESUME_COLLECTION_ID as string
       );
       const resumeFiles = await storage.listFiles(
-        process.env.NEXT_PUBLIC_BUCKED_ID as string
+        process.env.NEXT_PUBLIC_BUCKET_ID as string
       );
 
       const resumes: Resume[] = resumeDocuments.documents.map((doc) => {
@@ -55,7 +57,7 @@ export default function ResumeList() {
       );
 
       await storage.deleteFile(
-        process.env.NEXT_PUBLIC_BUCKED_ID as string,
+        process.env.NEXT_PUBLIC_BUCKET_ID as string,
         resumeId
       );
       setResumes((prev) => prev.filter((res) => res.$id !== resumeId));

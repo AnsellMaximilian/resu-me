@@ -11,6 +11,7 @@ import { ImArrowDown as Download } from "react-icons/im";
 import { BsEyeFill as Eye } from "react-icons/bs";
 import { Menu } from "@headlessui/react";
 import { storage } from "@/libs/appwrite";
+import Link from "next/link";
 
 export default function ResumeCard({
   resume,
@@ -20,7 +21,7 @@ export default function ResumeCard({
   handleDelete: (resumeId: string) => Promise<boolean>;
 }) {
   const url = storage.getFileDownload(
-    process.env.NEXT_PUBLIC_BUCKED_ID as string,
+    process.env.NEXT_PUBLIC_BUCKET_ID as string,
     resume.$id
   );
   return (
@@ -74,7 +75,9 @@ export default function ResumeCard({
       </div>
       <div className="whitespace-nowrap overflow-hidden">
         <div className="text-md text-secondary-main font-bold text-ellipsis overflow-hidden">
-          {resume.title}
+          <Link href={`/app/resumes/${resume.$id}`} className="hover:underline">
+            {resume.title}
+          </Link>
         </div>
         <div className="text-sm text-ellipsis overflow-hidden">
           {resume.description ? resume.description : "No description."}
