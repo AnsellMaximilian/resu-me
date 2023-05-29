@@ -17,12 +17,20 @@
 }
 
 @layer components {
+  .btn {
+    @apply focus:outline-none focus:ring-4 rounded-full px-4 py-1.5;
+  }
+
   .outline-btn {
-    @apply text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 rounded-full text-sm px-4 py-1.5;
+    @apply btn text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-gray-200 text-sm;
   }
 
   .primary-btn {
-    @apply text-white bg-secondary-main hover:bg-secondary-dark focus:outline-none focus:ring-4 focus:ring-secondary-light font-medium rounded-full px-4 py-1.5;
+    @apply btn text-white bg-secondary-main hover:bg-secondary-dark focus:ring-secondary-light font-medium;
+  }
+
+  .danger-btn {
+    @apply btn bg-red-500 text-white focus:ring-red-200 hover:bg-red-600;
   }
 
   .head-text {
@@ -33,11 +41,15 @@
     @apply bg-gray-50 border border-gray-300 focus:ring-1 text-gray-900 sm:text-sm rounded-lg focus:outline-none focus:ring-secondary-main focus:border-secondary-main block w-full p-2.5;
   }
 
-  .checkbox-toggle {
+  .badge--outline {
     @apply text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 rounded-full text-sm px-4 py-1.5;
   }
 
+  .checkbox-toggle {
+    @apply badge--outline;
+  }
+
   .checkbox-toggle--checked {
-    @apply text-gray-900 bg-green-200 border border-green-500 hover:bg-green-300 rounded-full text-sm px-4 py-1.5;
+    @apply badge--outline bg-green-200 border-green-500 hover:bg-green-300;
   }
 }
