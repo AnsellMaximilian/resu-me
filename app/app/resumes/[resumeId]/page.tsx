@@ -14,6 +14,7 @@ import {
   FaFileWord as Word,
   FaTrash as Trash,
 } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 export default function ResumePage({
   params: { resumeId },
@@ -25,6 +26,27 @@ export default function ResumePage({
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [file, setFile] = useState<Models.File>();
+
+  const router = useRouter();
+
+  const handleDelete = async () => {
+    try {
+      await databases.deleteDocument(
+        process.env.NEXT_PUBLIC_DATABASE_ID as string,
+        process.env.NEXT_PUBLIC_RESUME_COLLECTION_ID as string,
+        resumeId
+      );
+      await storage.deleteFile(
+        process.env.NEXT_PUBLIC_BUCKET_ID as string,
+        resumeId
+      );
+
+      router.push("/app/");
+    } catch (error) {
+      toast.error("Failed to delete.");
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -35,7 +57,7 @@ export default function ResumePage({
         )) as Resume;
         setResume(resume);
 
-        if (resume.skillIds.length > 0) {
+        if (resume.skillIds?.length > 0) {
           const skills = await databases.listDocuments(
             process.env.NEXT_PUBLIC_DATABASE_ID as string,
             process.env.NEXT_PUBLIC_SKILL_COLLECTION_ID as string,
@@ -45,7 +67,7 @@ export default function ResumePage({
           setSkills(skills.documents as Skill[]);
         }
 
-        if (resume.industryIds.length > 0) {
+        if (resume.industryIds?.length > 0) {
           const industries = await databases.listDocuments(
             process.env.NEXT_PUBLIC_DATABASE_ID as string,
             process.env.NEXT_PUBLIC_INDUSTRY_COLLECTION_ID as string,
@@ -55,7 +77,7 @@ export default function ResumePage({
           setIndustries(industries.documents as Role[]);
         }
 
-        if (resume.roleIds.length > 0) {
+        if (resume.roleIds?.length > 0) {
           const roles = await databases.listDocuments(
             process.env.NEXT_PUBLIC_DATABASE_ID as string,
             process.env.NEXT_PUBLIC_ROLE_COLLECTION_ID as string,
@@ -153,8 +175,11 @@ export default function ResumePage({
             <div className="col-span-12 md:col-span-6 bg-white p-4 shadow-md rounded-md">
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 col-span-12 md:col-span-6">
                 <div className="sm:col-span-2">
-                  <div className="mb-2 font-semibold text-gray-900">
-                    Resume File
+                  <div className="mb-2 flex gap-2 items-center">
+                    <div className="font-semibold text-gray-900">
+                      Resume File
+                    </div>
+                    <div className="text-gray-500 text-xs">{file.name}</div>
                   </div>
                   <div>
                     <iframe src={url.href.replace("download", "view")} />
@@ -169,7 +194,10 @@ export default function ResumePage({
                     >
                       <Download /> <span>Download</span>
                     </a>
-                    <button className="btn danger-btn flex gap-2 items-center">
+                    <button
+                      className="btn danger-btn flex gap-2 items-center"
+                      onClick={handleDelete}
+                    >
                       <Trash /> <span>Delete</span>
                     </button>
                     <a
