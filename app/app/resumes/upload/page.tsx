@@ -140,6 +140,10 @@ export default function UploadResumePage() {
         .filter((box) => box.checked)
         .map((box) => box.item.$id);
 
+      const selectedRoleIds = roleCheckboxes
+        .filter((box) => box.checked)
+        .map((box) => box.item.$id);
+
       const resume = await databases.createDocument(
         process.env.NEXT_PUBLIC_DATABASE_ID as string,
         process.env.NEXT_PUBLIC_RESUME_COLLECTION_ID as string,
@@ -150,6 +154,7 @@ export default function UploadResumePage() {
           userId: currentAccount.$id,
           skillIds: selectedSkillIds,
           industryIds: selectedIndustryIds,
+          roleIds: selectedRoleIds,
         }
       );
 
