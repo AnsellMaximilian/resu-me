@@ -24,6 +24,10 @@ interface Industry extends Models.Document {
   name: string;
 }
 
+interface Role extends Models.Document {
+  name: string;
+}
+
 export default function UploadResumePage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -34,6 +38,7 @@ export default function UploadResumePage() {
   const [industryCheckboxes, setIndustryCheckboxes] = useState<
     Checkbox<Industry>[]
   >([]);
+  const [roleCheckboxes, setRoleCheckboxes] = useState<Checkbox<Role>[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -70,6 +75,22 @@ export default function UploadResumePage() {
       );
 
       setIndustryCheckboxes(industryCheckboxes);
+
+      const roles = (
+        await databases.listDocuments(
+          process.env.NEXT_PUBLIC_DATABASE_ID as string,
+          process.env.NEXT_PUBLIC_ROLE_COLLECTION_ID as string,
+          [Query.equal("approved", true)]
+        )
+      ).documents as Industry[];
+
+      const roleCheckboxes: Checkbox<Role>[] = roles.map((industry) => ({
+        key: industry.$id,
+        item: industry,
+        checked: false,
+      }));
+
+      setRoleCheckboxes(roleCheckboxes);
     })();
   }, []);
 
@@ -240,7 +261,7 @@ export default function UploadResumePage() {
                       try {
                         const skillResponse = await functions.createExecution(
                           process.env
-                            .NEXT_PUBLIC_FUNCTION_ID_SUMBIT_CUSTOM_SKILL as string,
+                            .NEXT_PUBLIC_FUNCTION_ID_SUBMIT_CUSTOM_SKILL as string,
                           JSON.stringify({ name: customValue })
                         );
                         const skill = JSON.parse(
@@ -275,7 +296,7 @@ export default function UploadResumePage() {
                         const industryResponse =
                           await functions.createExecution(
                             process.env
-                              .NEXT_PUBLIC_FUNCTION_ID_SUMBIT_CUSTOM_INDUSTRY as string,
+                              .NEXT_PUBLIC_FUNCTION_ID_SUBMIT_CUSTOM_INDUSTRY as string,
                             JSON.stringify({ name: customValue })
                           );
                         const industry = JSON.parse(
@@ -296,6 +317,40 @@ export default function UploadResumePage() {
                       }
                     }}
                     setCheckboxes={setIndustryCheckboxes}
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Roles
+                  </div>
+                  <CheckBoxList
+                    items={roleCheckboxes}
+                    renderId={(checkbox) =>
+                      checkbox.item.name + checkbox.item.$id
+                    }
+                    renderLabel={(checkbox) => checkbox.item.name}
+                    handleCustomValueSubmit={async (customValue) => {
+                      try {
+                        const roleResponse = await functions.createExecution(
+                          process.env
+                            .NEXT_PUBLIC_FUNCTION_ID_SUBMIT_CUSTOM_ROLE as string,
+                          JSON.stringify({ name: customValue })
+                        );
+                        const role = JSON.parse(
+                          roleResponse.response
+                        ) as Industry;
+                        const roleCheckbox: Checkbox<Role> = {
+                          key: role.$id,
+                          item: role,
+                          checked: false,
+                        };
+                        setRoleCheckboxes((prev) => [...prev, roleCheckbox]);
+                        return true;
+                      } catch (error) {
+                        return false;
+                      }
+                    }}
+                    setCheckboxes={setRoleCheckboxes}
                   />
                 </div>
               </div>

@@ -46,6 +46,21 @@
             "events": [],
             "schedule": "",
             "timeout": 15
+        },
+        {
+            "$id": "64741bc412483a4ea476",
+            "name": "submitCustomRole",
+            "runtime": "node-16.0",
+            "path": "functions/submitCustomRole",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
         }
     ]
 }
