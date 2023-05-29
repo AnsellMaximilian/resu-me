@@ -31,6 +31,21 @@
             "events": [],
             "schedule": "",
             "timeout": 15
+        },
+        {
+            "$id": "647301621a479803e5a5",
+            "name": "submitCustomIndustry",
+            "runtime": "node-16.0",
+            "path": "functions/submitCustomIndustry",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
         }
     ]
 }

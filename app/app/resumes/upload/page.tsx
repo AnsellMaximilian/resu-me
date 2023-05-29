@@ -20,6 +20,10 @@ interface Skill extends Models.Document {
   name: string;
 }
 
+interface Industry extends Models.Document {
+  name: string;
+}
+
 export default function UploadResumePage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -27,6 +31,9 @@ export default function UploadResumePage() {
   const [description, setDescription] = useState("");
   const { currentAccount } = useAuth();
   const [skillCheckboxes, setSkillCheckboxes] = useState<Checkbox<Skill>[]>([]);
+  const [industryCheckboxes, setIndustryCheckboxes] = useState<
+    Checkbox<Industry>[]
+  >([]);
 
   useEffect(() => {
     (async () => {
@@ -45,6 +52,24 @@ export default function UploadResumePage() {
       }));
 
       setSkillCheckboxes(skillCheckboxes);
+
+      const industries = (
+        await databases.listDocuments(
+          process.env.NEXT_PUBLIC_DATABASE_ID as string,
+          process.env.NEXT_PUBLIC_INDUSTRY_COLLECTION_ID as string,
+          [Query.equal("approved", true)]
+        )
+      ).documents as Industry[];
+
+      const industryCheckboxes: Checkbox<Industry>[] = industries.map(
+        (industry) => ({
+          key: industry.$id,
+          item: industry,
+          checked: false,
+        })
+      );
+
+      setIndustryCheckboxes(industryCheckboxes);
     })();
   }, []);
 
@@ -90,6 +115,10 @@ export default function UploadResumePage() {
         .filter((box) => box.checked)
         .map((box) => box.item.$id);
 
+      const selectedIndustryIds = industryCheckboxes
+        .filter((box) => box.checked)
+        .map((box) => box.item.$id);
+
       const resume = await databases.createDocument(
         process.env.NEXT_PUBLIC_DATABASE_ID as string,
         process.env.NEXT_PUBLIC_RESUME_COLLECTION_ID as string,
@@ -99,6 +128,7 @@ export default function UploadResumePage() {
           description,
           userId: currentAccount.$id,
           skillIds: selectedSkillIds,
+          industryIds: selectedIndustryIds,
         }
       );
 
@@ -228,6 +258,44 @@ export default function UploadResumePage() {
                       }
                     }}
                     setCheckboxes={setSkillCheckboxes}
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Industry
+                  </div>
+                  <CheckBoxList
+                    items={industryCheckboxes}
+                    renderId={(checkbox) =>
+                      checkbox.item.name + checkbox.item.$id
+                    }
+                    renderLabel={(checkbox) => checkbox.item.name}
+                    handleCustomValueSubmit={async (customValue) => {
+                      try {
+                        const industryResponse =
+                          await functions.createExecution(
+                            process.env
+                              .NEXT_PUBLIC_FUNCTION_ID_SUMBIT_CUSTOM_INDUSTRY as string,
+                            JSON.stringify({ name: customValue })
+                          );
+                        const industry = JSON.parse(
+                          industryResponse.response
+                        ) as Industry;
+                        const industryCheckbox: Checkbox<Industry> = {
+                          key: industry.$id,
+                          item: industry,
+                          checked: false,
+                        };
+                        setIndustryCheckboxes((prev) => [
+                          ...prev,
+                          industryCheckbox,
+                        ]);
+                        return true;
+                      } catch (error) {
+                        return false;
+                      }
+                    }}
+                    setCheckboxes={setIndustryCheckboxes}
                   />
                 </div>
               </div>
