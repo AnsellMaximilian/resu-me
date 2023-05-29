@@ -17,12 +17,12 @@ export default function AppHeader() {
               <li>
                 <ActiveLink label="Dashboard" href="/app" />
               </li>
-              <li>
+              {/* <li>
                 <ActiveLink label="Resume" href="/app/resumes" />
               </li>
               <li>
                 <ActiveLink label="Groups" href="/app/groups" />
-              </li>
+              </li> */}
             </ul>
           </div>
         </div>
