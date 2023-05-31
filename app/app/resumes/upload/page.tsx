@@ -18,14 +18,17 @@ import { v4 as uuidv4 } from "uuid";
 
 export interface Skill extends Models.Document {
   name: string;
+  approved: boolean;
 }
 
 export interface Industry extends Models.Document {
   name: string;
+  approved: boolean;
 }
 
 export interface Role extends Models.Document {
   name: string;
+  approved: boolean;
 }
 
 export default function UploadResumePage() {

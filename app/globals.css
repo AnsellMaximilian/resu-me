@@ -52,4 +52,20 @@
   .checkbox-toggle--checked {
     @apply badge--outline bg-green-200 border-green-500 hover:bg-green-300;
   }
+
+  .popover {
+    @apply bg-white w-64 ring-1 ring-gray-200 rounded-lg overflow-hidden shadow-lg;
+  }
+
+  .filter-input {
+    @apply btn text-gray-900 bg-white border border-gray-300 hover:bg-gray-100 focus:ring-gray-200 text-sm;
+  }
+
+  .filter-input--active {
+    @apply btn text-white bg-green-500 hover:bg-green-800 focus:ring-green-200 text-sm;
+  }
+
+  .filter__amount {
+    @apply rounded-full bg-white text-gray-600 h-4 min-w-[16px] text-xs flex items-center justify-center;
+  }
 }

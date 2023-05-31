@@ -4,13 +4,33 @@ import client, { account, databases, storage } from "@/libs/appwrite";
 import { Account, Models } from "appwrite";
 
 import AppHeader from "@/components/AppHeader";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import ResumeList, { Resume } from "@/components/ResumeList";
 import { ToastContainer, toast } from "react-toastify";
+import { Popover } from "@headlessui/react";
+import { Skill, Industry, Role } from "./resumes/upload/page";
+import CheckBoxList, { Checkbox } from "@/components/CheckBoxList";
+import ResumeFilter, { FilterFunction } from "@/components/ResumeFilter";
 
 export default function AppPage() {
-  const [titleSearch, setTitleSearch] = useState("");
   const [resumes, setResumes] = useState<Resume[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [industries, setIndustries] = useState<Industry[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [filteredResumes, setFilteredResumes] = useState<Resume[]>([]);
+
+  const approvedSkills = useMemo(
+    () => skills.filter((item) => item.approved),
+    [skills]
+  );
+  const approvedRoles = useMemo(
+    () => roles.filter((item) => item.approved),
+    [roles]
+  );
+  const approvedIndustries = useMemo(
+    () => industries.filter((item) => item.approved),
+    [industries]
+  );
 
   useEffect(() => {
     (async () => {
@@ -32,6 +52,28 @@ export default function AppPage() {
       });
 
       setResumes(resumes);
+      setFilteredResumes(resumes);
+
+      const skills = await databases.listDocuments(
+        process.env.NEXT_PUBLIC_DATABASE_ID as string,
+        process.env.NEXT_PUBLIC_SKILL_COLLECTION_ID as string
+      );
+
+      setSkills(skills.documents as Skill[]);
+
+      const industries = await databases.listDocuments(
+        process.env.NEXT_PUBLIC_DATABASE_ID as string,
+        process.env.NEXT_PUBLIC_INDUSTRY_COLLECTION_ID as string
+      );
+
+      setIndustries(industries.documents as Role[]);
+
+      const roles = await databases.listDocuments(
+        process.env.NEXT_PUBLIC_DATABASE_ID as string,
+        process.env.NEXT_PUBLIC_ROLE_COLLECTION_ID as string
+      );
+
+      setRoles(roles.documents as Role[]);
     })();
   }, []);
 
@@ -57,22 +99,50 @@ export default function AppPage() {
     }
   };
 
+  const handleFilter: FilterFunction = (
+    skillsCheckboxes,
+    roleCheckboxes,
+    industryCheckboxes,
+    titleFilter
+  ) => {
+    const checkedSkillIds = skillsCheckboxes
+      .filter((box) => box.checked)
+      .map((box) => box.item.$id);
+    const checkedRoleIds = roleCheckboxes
+      .filter((box) => box.checked)
+      .map((box) => box.item.$id);
+    const checkedIndustryIds = industryCheckboxes
+      .filter((box) => box.checked)
+      .map((box) => box.item.$id);
+
+    console.log(resumes[1], checkedSkillIds);
+
+    setFilteredResumes((prev) =>
+      resumes.filter((res) => {
+        return (
+          res.title.toLowerCase().includes(titleFilter.toLowerCase()) &&
+          (checkedSkillIds.length === 0 ||
+            res.skillIds.some((id) => checkedSkillIds.includes(id))) &&
+          (checkedRoleIds.length === 0 ||
+            res.roleIds.some((id) => checkedRoleIds.includes(id))) &&
+          (checkedIndustryIds.length === 0 ||
+            res.industryIds.some((id) => checkedIndustryIds.includes(id)))
+        );
+      })
+    );
+  };
+
   return (
     <div className="p-4">
       <div className="mb-4">
-        <div>
-          <input
-            value={titleSearch}
-            onChange={(e) => setTitleSearch(e.target.value)}
-            type="search"
-            name="search-title"
-            id="search-title"
-            className="input rounded-full"
-            placeholder="Search for resume title"
-          />
-        </div>
+        <ResumeFilter
+          skills={approvedSkills}
+          industries={approvedIndustries}
+          roles={approvedRoles}
+          onFilter={handleFilter}
+        />
       </div>
-      <ResumeList resumes={resumes} handleDelete={handleDelete} />
+      <ResumeList resumes={filteredResumes} handleDelete={handleDelete} />
       <ToastContainer />
     </div>
   );
