@@ -22,54 +22,13 @@ export type Resume = Models.Document & {
   file: Models.File | null;
 };
 
-export default function ResumeList() {
-  const [resumes, setResumes] = useState<Resume[]>([]);
-
-  useEffect(() => {
-    (async () => {
-      const resumeDocuments = await databases.listDocuments(
-        process.env.NEXT_PUBLIC_DATABASE_ID as string,
-        process.env.NEXT_PUBLIC_RESUME_COLLECTION_ID as string
-      );
-      const resumeFiles = await storage.listFiles(
-        process.env.NEXT_PUBLIC_BUCKET_ID as string
-      );
-
-      const resumes: Resume[] = resumeDocuments.documents.map((doc) => {
-        const resume = { ...doc };
-        resume.title = doc.title as string;
-        resume.description = doc.description as string;
-        resume.file =
-          resumeFiles.files.find((file) => file.$id === resume.$id) || null;
-        return resume as Resume;
-      });
-
-      setResumes(resumes);
-    })();
-  }, []);
-
-  const handleDelete = async (resumeId: string) => {
-    try {
-      await databases.deleteDocument(
-        process.env.NEXT_PUBLIC_DATABASE_ID as string,
-        process.env.NEXT_PUBLIC_RESUME_COLLECTION_ID as string,
-        resumeId
-      );
-
-      await storage.deleteFile(
-        process.env.NEXT_PUBLIC_BUCKET_ID as string,
-        resumeId
-      );
-      setResumes((prev) => prev.filter((res) => res.$id !== resumeId));
-      toast.success(`Deleted resume of id ${resumeId}`);
-      return true;
-    } catch (error) {
-      toast.error(`Failed to delete.`);
-
-      return false;
-    }
-  };
-
+export default function ResumeList({
+  resumes,
+  handleDelete,
+}: {
+  resumes: Resume[];
+  handleDelete: (resumeId: string) => Promise<boolean>;
+}) {
   return (
     <section>
       <header className="flex justify-between items-end mb-4">
