@@ -21,11 +21,18 @@ export type SumbitFunction = (
   industryCheckboxes: Checkbox<Industry>[]
 ) => Promise<void>;
 
+export type WithChecked<T> = T & {
+  checked?: boolean;
+};
+
 interface ResumeFormProps {
   onSubmit: SumbitFunction;
-  skills: Skill[];
-  industries: Industry[];
-  roles: Role[];
+  skills: Array<Skill | WithChecked<Skill>>;
+  industries: Array<Industry | WithChecked<Industry>>;
+  roles: Array<Role | WithChecked<Role>>;
+  oldTitle?: string;
+  oldDescription?: string;
+  edit?: boolean;
 }
 
 export default function ResumeForm({
@@ -33,6 +40,9 @@ export default function ResumeForm({
   skills,
   industries,
   roles,
+  oldTitle,
+  oldDescription,
+  edit = false,
 }: ResumeFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -59,10 +69,16 @@ export default function ResumeForm({
 
   useEffect(() => {
     (async () => {
+      if (oldTitle) {
+        setTitle(oldTitle);
+      }
+      if (oldDescription) {
+        setDescription(oldDescription);
+      }
       const skillCheckboxes: Checkbox<Skill>[] = skills.map((skill) => ({
         key: skill.$id,
         item: skill,
-        checked: false,
+        checked: !!skill.checked,
       }));
 
       setSkillCheckboxes(skillCheckboxes);
@@ -71,21 +87,21 @@ export default function ResumeForm({
         (industry) => ({
           key: industry.$id,
           item: industry,
-          checked: false,
+          checked: !!industry.checked,
         })
       );
 
       setIndustryCheckboxes(industryCheckboxes);
 
-      const roleCheckboxes: Checkbox<Role>[] = roles.map((industry) => ({
-        key: industry.$id,
-        item: industry,
-        checked: false,
+      const roleCheckboxes: Checkbox<Role>[] = roles.map((role) => ({
+        key: role.$id,
+        item: role,
+        checked: !!role.checked,
       }));
 
       setRoleCheckboxes(roleCheckboxes);
     })();
-  }, [skills, roles, industries]);
+  }, [skills, roles, industries, oldTitle, oldDescription]);
 
   // FILE HANDLING
   const handleOnFileChosen: <T extends File>(
@@ -283,7 +299,7 @@ export default function ResumeForm({
             (submitting ? "justify-start" : "justify-center")
           }
         >
-          <span>Upload</span>
+          <span>{edit ? "Update" : "Upload"}</span>
           {submitting && <Spinner />}
         </button>
       </div>

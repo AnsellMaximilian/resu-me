@@ -10,6 +10,7 @@ import { RiMoreLine } from "react-icons/ri";
 import { ImArrowDown as Download } from "react-icons/im";
 import { BsEyeFill as Eye } from "react-icons/bs";
 import { Menu } from "@headlessui/react";
+import { MdModeEditOutline as Edit } from "react-icons/md";
 import { storage } from "@/libs/appwrite";
 import Link from "next/link";
 
@@ -30,7 +31,7 @@ export default function ResumeCard({
         <Menu.Button className="p-1">
           <RiMoreLine />
         </Menu.Button>
-        <Menu.Items className="absolute text-xs z-50 right-0 shadow-lg origin-top-right bg-white mt-1 w-32 ring-1 ring-gray-200 rounded-lg overflow-hidden">
+        <Menu.Items className="absolute text-sm z-50 right-0 shadow-lg origin-top-right bg-white mt-1 w-32 ring-1 ring-gray-200 rounded-lg overflow-hidden">
           <Menu.Item>
             <button
               onClick={() => handleDelete(resume.$id)}
@@ -48,6 +49,14 @@ export default function ResumeCard({
             >
               <Download size={10} className="text-gray-600" /> Download
             </a>
+          </Menu.Item>
+          <Menu.Item>
+            <Link
+              className="flex gap-2 items-center px-3 py-2 hover:text-black transition-all duration-100 w-full text-left hover:bg-primary-main"
+              href={`/app/resumes/${resume.$id}/edit`}
+            >
+              <Edit size={10} className="text-gray-600" /> Edit
+            </Link>
           </Menu.Item>
           <Menu.Item>
             <a
