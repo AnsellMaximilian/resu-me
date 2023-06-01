@@ -8,6 +8,7 @@ import { Industry, Role, Skill } from "../upload/page";
 import { Models, Query } from "appwrite";
 import { BsEyeFill as Eye } from "react-icons/bs";
 import { ImArrowDown as Download } from "react-icons/im";
+import { MdModeEditOutline as Edit } from "react-icons/md";
 
 import {
   FaFilePdf as PDF,
@@ -15,6 +16,7 @@ import {
   FaTrash as Trash,
 } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function ResumePage({
   params: { resumeId },
@@ -109,8 +111,14 @@ export default function ResumePage({
       <div className="p-4">
         <section>
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 bg-white p-4 shadow-md rounded-md">
+            <div className="col-span-12 bg-white p-4 shadow-md rounded-md flex items-center justify-between">
               <h1 className="font-bold text-2xl">{resume.title}</h1>
+              <Link
+                href={`/app/resumes/${resumeId}/edit`}
+                className="outline-btn flex gap-2 items-center"
+              >
+                <Edit /> <span>Edit</span>
+              </Link>
             </div>
             <div className="col-span-12 md:col-span-6 bg-white p-4 shadow-md rounded-md">
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 col-span-12 md:col-span-6">
