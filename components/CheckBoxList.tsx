@@ -35,17 +35,25 @@ export default function CheckBoxList<T>({
   ) => {
     if (e.key === "Enter" && !submitting) {
       e.preventDefault(); // Prevent form submission
-      setSubmitting(true);
-      if (!customValue) return;
-      // Check if it already exists
-      if (items.find((box) => renderLabel(box) === customValue)) {
-        toast.error("That value already exists.");
-        return;
-      }
-      setCustomValue("");
+      try {
+        setSubmitting(true);
+        if (!customValue) throw new Error("Cannot be empty.");
+        // Check if it already exists
+        if (items.find((box) => renderLabel(box) === customValue)) {
+          throw new Error("That value already exists.");
+        }
+        setCustomValue("");
 
-      const success = await handleCustomValueSubmit(customValue);
-      setSubmitting(false);
+        const success = await handleCustomValueSubmit(customValue);
+      } catch (error: any) {
+        if (Object.hasOwn(error, "message")) {
+          toast.error(error.message);
+        } else {
+          toast.error("Unknown error");
+        }
+      } finally {
+        setSubmitting(false);
+      }
     }
   };
 
