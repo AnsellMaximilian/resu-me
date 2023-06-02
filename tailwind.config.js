@@ -7,9 +7,15 @@ module.exports = {
   ],
   theme: {
     extend: {
+      spacing: {
+        "appheader-h": "3.5rem",
+        "sidebar-w-open": "16rem",
+      },
+
       colors: {
         primary: {
           main: "#f9fafb",
+          dark: "#ebebeb",
         },
         secondary: {
           main: "#2185D5",

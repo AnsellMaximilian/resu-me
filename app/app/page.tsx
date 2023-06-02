@@ -11,6 +11,7 @@ import { Popover } from "@headlessui/react";
 import { Skill, Industry, Role } from "./resumes/upload/page";
 import CheckBoxList, { Checkbox } from "@/components/CheckBoxList";
 import ResumeFilter, { FilterFunction } from "@/components/ResumeFilter";
+import Sidebar, { Group } from "@/components/Sidebar";
 
 export default function AppPage() {
   const [resumes, setResumes] = useState<Resume[]>([]);
@@ -18,6 +19,7 @@ export default function AppPage() {
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [filteredResumes, setFilteredResumes] = useState<Resume[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
 
   const approvedSkills = useMemo(
     () => skills.filter((item) => item.approved),
@@ -74,6 +76,13 @@ export default function AppPage() {
       );
 
       setRoles(roles.documents as Role[]);
+
+      const groups = await databases.listDocuments(
+        process.env.NEXT_PUBLIC_DATABASE_ID as string,
+        process.env.NEXT_PUBLIC_GROUP_COLLECTION_ID as string
+      );
+
+      setGroups(groups.documents as Group[]);
     })();
   }, []);
 
@@ -133,17 +142,22 @@ export default function AppPage() {
   };
 
   return (
-    <div className="p-4">
-      <div className="mb-4">
-        <ResumeFilter
-          skills={approvedSkills}
-          industries={approvedIndustries}
-          roles={approvedRoles}
-          onFilter={handleFilter}
-        />
+    <div className="bg-primary-main overflow-hidden">
+      <Sidebar groups={groups} />
+      <div className="ml-sidebar-w-open">
+        <div className="p-4">
+          <div className="mb-4">
+            <ResumeFilter
+              skills={approvedSkills}
+              industries={approvedIndustries}
+              roles={approvedRoles}
+              onFilter={handleFilter}
+            />
+          </div>
+          <ResumeList resumes={filteredResumes} handleDelete={handleDelete} />
+          <ToastContainer />
+        </div>
       </div>
-      <ResumeList resumes={filteredResumes} handleDelete={handleDelete} />
-      <ToastContainer />
     </div>
   );
 }

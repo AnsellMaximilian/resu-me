@@ -1,11 +1,12 @@
 import AppHeader from "@/components/AppHeader";
+import Sidebar from "@/components/Sidebar";
 import React from "react";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div>
+    <div className="h-screen">
       <AppHeader />
-      <div className="min-h-screen bg-primary-main mt-14">{children}</div>
+      {children}
     </div>
   );
 }

@@ -8,7 +8,7 @@ import ActiveLink from "./ActiveLink";
 export default function AppHeader() {
   const { currentAccount, logout } = useAuth();
   return (
-    <header className="bg-white h-14 px-4 shadow-md flex items-center fixed top-0 inset-x-0 z-50">
+    <header className="bg-white h-appheader-h px-4 flex items-center sticky top-0 inset-x-0 z-50 border-b border-gray-200">
       <nav className="flex justify-between items-center w-full">
         <div className="flex gap-8 items-center">
           <div className="font-bold text-lg">Resu-Me</div>
