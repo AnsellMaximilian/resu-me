@@ -142,10 +142,10 @@ export default function AppPage() {
   };
 
   return (
-    <div className="bg-primary-main overflow-hidden">
+    <div className="bg-primary-main overflow-hidden h-full">
       <Sidebar groups={groups} />
-      <div className="ml-sidebar-w-open">
-        <div className="p-4">
+      <div className="ml-sidebar-w-open h-full">
+        <div className="p-4 h-full">
           <div className="mb-4">
             <ResumeFilter
               skills={approvedSkills}
