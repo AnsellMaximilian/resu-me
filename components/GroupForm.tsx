@@ -39,13 +39,12 @@ export default function GroupForm({
           Parent Group
         </label>
         <select
-          defaultValue="none"
           value={selectedParentGroupId}
           id="parentGroup"
           onChange={(e) => setSelectedParentGroupId(e.target.value)}
           className="input"
         >
-          <option value="all">None</option>
+          <option value="none">None</option>
           {groups.map((group) => (
             <option key={group.$id} value={group.$id}>
               {group.name}

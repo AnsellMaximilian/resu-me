@@ -68,6 +68,7 @@ export default function Sidebar({
           <Plus />
         </button>
       </div>
+
       <GroupList groups={groups} />
       <Transition appear show={isCreateGroupDialogOpen} as={Fragment}>
         <Dialog
