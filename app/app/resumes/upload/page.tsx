@@ -1,6 +1,7 @@
 "use client";
 
 import CheckBoxList, { Checkbox } from "@/components/CheckBoxList";
+import { Group } from "@/components/GroupList";
 import ResumeForm, { SumbitFunction } from "@/components/ResumeForm";
 import Spinner from "@/components/Spinner";
 import useAuth from "@/hooks/useAuth";
@@ -41,6 +42,7 @@ export default function UploadResumePage() {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -70,9 +72,18 @@ export default function UploadResumePage() {
           process.env.NEXT_PUBLIC_ROLE_COLLECTION_ID as string,
           [Query.equal("approved", true)]
         )
-      ).documents as Industry[];
+      ).documents as Role[];
 
       setRoles(roles);
+
+      const groups = (
+        await databases.listDocuments(
+          process.env.NEXT_PUBLIC_DATABASE_ID as string,
+          process.env.NEXT_PUBLIC_GROUP_COLLECTION_ID as string
+        )
+      ).documents as Group[];
+
+      setGroups(groups);
     })();
   }, []);
 
@@ -82,7 +93,8 @@ export default function UploadResumePage() {
     acceptedFiles,
     skillCheckboxes,
     roleCheckboxes,
-    industryCheckboxes
+    industryCheckboxes,
+    selectedGroupId
   ) => {
     try {
       if (!title) throw new Error("Title field is required.");
@@ -122,6 +134,7 @@ export default function UploadResumePage() {
           skillIds: selectedSkillIds,
           industryIds: selectedIndustryIds,
           roleIds: selectedRoleIds,
+          groupId: selectedGroupId === "none" ? null : selectedGroupId,
         }
       );
 
@@ -151,6 +164,7 @@ export default function UploadResumePage() {
             skills={skills}
             roles={roles}
             industries={industries}
+            groups={groups}
           />
         </div>
       </section>

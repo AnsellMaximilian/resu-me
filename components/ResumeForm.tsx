@@ -11,6 +11,7 @@ import CheckBoxList, { Checkbox } from "./CheckBoxList";
 import { useDropzone, DropEvent, FileRejection } from "react-dropzone";
 import { Skill, Role, Industry } from "@/app/app/resumes/upload/page";
 import { functions } from "@/libs/appwrite";
+import { Group } from "./GroupList";
 
 export type SumbitFunction = (
   title: string,
@@ -18,7 +19,8 @@ export type SumbitFunction = (
   acceptedFiles: File[],
   skillCheckboxes: Checkbox<Skill>[],
   roleCheckboxes: Checkbox<Role>[],
-  industryCheckboxes: Checkbox<Industry>[]
+  industryCheckboxes: Checkbox<Industry>[],
+  selectedGroupId: string
 ) => Promise<void>;
 
 export type WithChecked<T> = T & {
@@ -32,7 +34,9 @@ interface ResumeFormProps {
   roles: Array<Role | WithChecked<Role>>;
   oldTitle?: string;
   oldDescription?: string;
+  oldGroupId?: string;
   edit?: boolean;
+  groups: Group[];
 }
 
 export default function ResumeForm({
@@ -42,7 +46,9 @@ export default function ResumeForm({
   roles,
   oldTitle,
   oldDescription,
+  oldGroupId,
   edit = false,
+  groups,
 }: ResumeFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -52,6 +58,7 @@ export default function ResumeForm({
   >([]);
   const [roleCheckboxes, setRoleCheckboxes] = useState<Checkbox<Role>[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedGroupId, setSelectedGroupId] = useState<string>("none");
 
   const handleSumbit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
@@ -62,7 +69,8 @@ export default function ResumeForm({
       acceptedFiles,
       skillCheckboxes,
       roleCheckboxes,
-      industryCheckboxes
+      industryCheckboxes,
+      selectedGroupId
     );
     setSubmitting(false);
   };
@@ -74,6 +82,10 @@ export default function ResumeForm({
       }
       if (oldDescription) {
         setDescription(oldDescription);
+      }
+
+      if (oldGroupId) {
+        setSelectedGroupId(oldGroupId);
       }
       const skillCheckboxes: Checkbox<Skill>[] = skills.map((skill) => ({
         key: skill.$id,
@@ -101,7 +113,7 @@ export default function ResumeForm({
 
       setRoleCheckboxes(roleCheckboxes);
     })();
-  }, [skills, roles, industries, oldTitle, oldDescription]);
+  }, [skills, roles, industries, oldTitle, oldDescription, oldGroupId]);
 
   // FILE HANDLING
   const handleOnFileChosen: <T extends File>(
@@ -190,6 +202,27 @@ export default function ResumeForm({
           <p className="mt-1 text-sm text-gray-500" id="file_input_help">
             PDF, DOC, or DOCX (MAX. 400 MB).
           </p>
+        </div>
+        <div className="sm:col-span-2">
+          <label
+            htmlFor="group"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            Group
+          </label>
+          <select
+            value={selectedGroupId}
+            id="group"
+            onChange={(e) => setSelectedGroupId(e.target.value)}
+            className="input"
+          >
+            <option value="none">None</option>
+            {groups.map((group) => (
+              <option key={group.$id} value={group.$id}>
+                {group.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       {/* METADATA */}

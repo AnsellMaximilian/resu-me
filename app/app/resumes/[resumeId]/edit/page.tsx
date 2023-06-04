@@ -1,6 +1,7 @@
 "use client";
 
 import CheckBoxList, { Checkbox } from "@/components/CheckBoxList";
+import { Group } from "@/components/GroupList";
 import ResumeForm, {
   SumbitFunction,
   WithChecked,
@@ -50,6 +51,8 @@ export default function EditResumePage({
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [resume, setResume] = useState<Resume>();
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [selectedGroupId, setSelectedGroupId] = useState<string>("none");
 
   useEffect(() => {
     (async () => {
@@ -60,6 +63,7 @@ export default function EditResumePage({
       )) as Resume;
       setTitle(resume.title);
       setDescription(resume.description);
+      setSelectedGroupId(resume.groupId === null ? "none" : resume.groupId);
 
       const skills = (
         await databases.listDocuments(
@@ -114,6 +118,14 @@ export default function EditResumePage({
           )
       );
       setResume(resume);
+      const groups = (
+        await databases.listDocuments(
+          process.env.NEXT_PUBLIC_DATABASE_ID as string,
+          process.env.NEXT_PUBLIC_GROUP_COLLECTION_ID as string
+        )
+      ).documents as Group[];
+
+      setGroups(groups);
     })();
   }, []);
 
@@ -123,7 +135,8 @@ export default function EditResumePage({
     acceptedFiles,
     skillCheckboxes,
     roleCheckboxes,
-    industryCheckboxes
+    industryCheckboxes,
+    selectedGroupId
   ) => {
     try {
       if (!title) throw new Error("Title field is required.");
@@ -165,6 +178,7 @@ export default function EditResumePage({
           skillIds: selectedSkillIds,
           industryIds: selectedIndustryIds,
           roleIds: selectedRoleIds,
+          groupId: selectedGroupId === "none" ? null : selectedGroupId,
         }
       );
 
@@ -191,12 +205,14 @@ export default function EditResumePage({
             Edit Resume {title}
           </h2>
           <ResumeForm
+            groups={groups}
             onSubmit={handleSubmit}
             skills={skills}
             roles={roles}
             industries={industries}
             oldTitle={title}
             oldDescription={description}
+            oldGroupId={selectedGroupId}
             edit
           />
         </div>
