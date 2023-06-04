@@ -80,4 +80,12 @@
   .flex--between {
     @apply flex items-center justify-between;
   }
+
+  .resume-group > .resume-group__content > .resume-group__menu {
+    @apply hidden;
+  }
+
+  .resume-group:hover > .resume-group__content > .resume-group__menu {
+    @apply block;
+  }
 }

@@ -1,8 +1,10 @@
 "use client";
 
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog, Menu, Transition } from "@headlessui/react";
 import { ID, Models } from "appwrite";
 import { FaLayerGroup as All } from "react-icons/fa";
+import { MdModeEditOutline as Edit } from "react-icons/md";
+import { FaTrash as Trash } from "react-icons/fa";
 
 import React, {
   useMemo,
@@ -16,7 +18,7 @@ import {
   AiFillCaretDown as Down,
   AiFillCaretRight as Right,
 } from "react-icons/ai";
-
+import { RiMoreLine as More } from "react-icons/ri";
 export interface OrganizedGroup {
   group: Group;
   subgroups: OrganizedGroup[];
@@ -35,20 +37,46 @@ const Group = ({
   filterGroup: (id: string | null) => React.MouseEventHandler<HTMLDivElement>;
 }) => {
   const [subgroupOpen, setSubgroupOpen] = useState(false);
+  const handleDelete = () => {};
   return (
-    <div onClick={filterGroup(group.group.$id)}>
-      <div className="px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer flex items-center gap-2">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setSubgroupOpen(!subgroupOpen);
-          }}
-        >
-          {subgroupOpen ? <Down size={12} /> : <Right size={12} />}
-        </button>
-        <span className="block w-full text-ellipsis overflow-hidden whitespace-nowrap">
-          {group.group.name}
-        </span>
+    <div onClick={filterGroup(group.group.$id)} className="">
+      <div className="group flex items-center justify-between px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setSubgroupOpen(!subgroupOpen);
+            }}
+          >
+            {subgroupOpen ? <Down size={12} /> : <Right size={12} />}
+          </button>
+          <span className="block w-full text-ellipsis overflow-hidden whitespace-nowrap">
+            {group.group.name}
+          </span>
+        </div>
+        <Menu as="div" className="relative hidden group-hover:block ">
+          <Menu.Button
+            className="block hover:text-secondary-main"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <More />
+          </Menu.Button>
+          <Menu.Items className="absolute text-sm z-50 right-0 shadow-lg origin-top-right bg-white mt-1 w-32 ring-1 ring-gray-200 rounded-lg overflow-hidden">
+            <Menu.Item>
+              <button
+                onClick={() => {}}
+                className="flex gap-2 items-center px-3 py-2 hover:text-black transition-all duration-100 w-full text-left hover:bg-primary-main"
+              >
+                <Trash size={10} className="text-gray-600" /> Delete
+              </button>
+            </Menu.Item>
+            <Menu.Item>
+              <button className="flex gap-2 items-center px-3 py-2 hover:text-black transition-all duration-100 w-full text-left hover:bg-primary-main">
+                <Edit size={10} className="text-gray-600" /> Edit
+              </button>
+            </Menu.Item>
+          </Menu.Items>
+        </Menu>
       </div>
       {subgroupOpen && group.subgroups.length > 0 && (
         <ul className="flex flex-col gap-2 mt-2">
