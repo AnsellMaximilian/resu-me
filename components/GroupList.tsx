@@ -38,7 +38,12 @@ const Group = ({
   return (
     <div onClick={filterGroup(group.group.$id)}>
       <div className="px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer flex items-center gap-2">
-        <button onClick={() => setSubgroupOpen(!subgroupOpen)}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setSubgroupOpen(!subgroupOpen);
+          }}
+        >
           {subgroupOpen ? <Down size={12} /> : <Right size={12} />}
         </button>
         <span className="block w-full text-ellipsis overflow-hidden whitespace-nowrap">
@@ -108,7 +113,12 @@ export default function GroupList({
             className="px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer flex items-center gap-2"
             onClick={filterGroup(null)}
           >
-            <button onClick={() => setIsGroupsOpen(!isGroupsOpen)}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsGroupsOpen(!isGroupsOpen);
+              }}
+            >
               {isGroupsOpen ? <Down size={12} /> : <Right size={12} />}
             </button>
             <span className="block w-full text-ellipsis overflow-hidden whitespace-nowrap">
