@@ -11,7 +11,8 @@ import { Popover } from "@headlessui/react";
 import { Skill, Industry, Role } from "./resumes/upload/page";
 import CheckBoxList, { Checkbox } from "@/components/CheckBoxList";
 import ResumeFilter, { FilterFunction } from "@/components/ResumeFilter";
-import Sidebar, { Group } from "@/components/Sidebar";
+import Sidebar from "@/components/Sidebar";
+import { Group } from "@/components/GroupList";
 
 export default function AppPage() {
   const [resumes, setResumes] = useState<Resume[]>([]);
@@ -20,6 +21,10 @@ export default function AppPage() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [filteredResumes, setFilteredResumes] = useState<Resume[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
+
+  const [resumeGroupFilter, setResumeGroupFilter] = useState<string | null>(
+    null
+  );
 
   const approvedSkills = useMemo(
     () => skills.filter((item) => item.approved),
@@ -143,7 +148,7 @@ export default function AppPage() {
 
   return (
     <div className="bg-primary-main overflow-hidden h-full">
-      <Sidebar groups={groups} />
+      <Sidebar groups={groups} setGroups={setGroups} />
       <div className="ml-sidebar-w-open h-full">
         <div className="p-4 h-full">
           <div className="mb-4">

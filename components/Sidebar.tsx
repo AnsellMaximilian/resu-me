@@ -1,101 +1,119 @@
 "use client";
 
-import { Models } from "appwrite";
-import React, { useMemo, useState } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { ID, Models } from "appwrite";
+import React, {
+  useMemo,
+  useState,
+  Fragment,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import {
   AiFillCaretDown as Down,
   AiFillCaretRight as Right,
 } from "react-icons/ai";
 import { FaPlus as Plus } from "react-icons/fa";
+import Spinner from "./Spinner";
+import GroupForm, { SubmitFunction } from "./GroupForm";
+import { toast } from "react-toastify";
+import { databases } from "@/libs/appwrite";
+import GroupList, { Group } from "./GroupList";
 
-interface OrganizedGroup {
-  group: Group;
-  subgroups: OrganizedGroup[];
-}
-
-export type Group = Models.Document & {
-  name: string;
-  parentGroupId?: string;
-};
-
-const Group = ({
-  group,
-  padding = 1,
+export default function Sidebar({
+  groups,
+  setGroups,
 }: {
-  group: OrganizedGroup;
-  padding?: number;
-}) => {
-  const [subgroupOpen, setSubgroupOpen] = useState(false);
-  return (
-    <div>
-      <div className="px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer flex items-center gap-2">
-        <button onClick={() => setSubgroupOpen(!subgroupOpen)}>
-          {subgroupOpen ? <Down size={12} /> : <Right size={12} />}
-        </button>
-        <span className="block w-full text-ellipsis overflow-hidden whitespace-nowrap">
-          {group.group.name}
-        </span>
-      </div>
-      {subgroupOpen && group.subgroups.length > 0 && (
-        <ul className="flex flex-col gap-2 mt-2">
-          {group.subgroups.map((group, idx) => (
-            <li
-              key={group.group.$id}
-              className=""
-              style={{ paddingLeft: `${padding * 16}px` }}
-            >
-              <Group group={group} padding={padding + 1} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-};
+  groups: Group[];
+  setGroups: Dispatch<SetStateAction<Group[]>>;
+}) {
+  const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
 
-function organizeGroups(groups: Group[], parentId?: string): OrganizedGroup[] {
-  const organizedGroups: OrganizedGroup[] = [];
+  const handleGroupSubmit: SubmitFunction = async (name, parentGroupId) => {
+    try {
+      if (!name) throw new Error("Name field is required.");
+      if (name.length > 20) throw new Error("Maximum is 20 characters.");
 
-  // Find all groups with the specified parentId
-  const filteredGroups = groups.filter((group) =>
-    parentId ? group.parentGroupId === parentId : !group.parentGroupId
-  );
+      const group = (await databases.createDocument(
+        process.env.NEXT_PUBLIC_DATABASE_ID as string,
+        process.env.NEXT_PUBLIC_GROUP_COLLECTION_ID as string,
+        ID.unique(),
+        {
+          name,
+          parentGroupId,
+        }
+      )) as Group;
 
-  // Iterate over each filtered group and organize its subgroups recursively
-  for (const group of filteredGroups) {
-    const organizedGroup: OrganizedGroup = {
-      group,
-      subgroups: organizeGroups(groups, group.$id), // Recursively organize subgroups
-    };
+      setIsCreateGroupDialogOpen(false);
+      setGroups((prev) => [...prev, group]);
 
-    organizedGroups.push(organizedGroup);
-  }
-
-  return organizedGroups;
-}
-
-export default function Sidebar({ groups }: { groups: Group[] }) {
-  const organizedGroups = useMemo(() => {
-    return organizeGroups(groups);
-  }, [groups]);
+      toast.success("Group created.");
+    } catch (error: any) {
+      if (Object.hasOwn(error, "message")) {
+        toast.error(error.message);
+      } else {
+        toast.error("Unknown error");
+      }
+    }
+  };
 
   return (
-    <div className="w-sidebar-w-open sidebar bg-white fixed left-0 border-r border-gray-200 p-2">
+    <div className="w-sidebar-w-open sidebar bg-white fixed left-0 border-r border-gray-200 p-4">
       <div className="mb-4 flex--between">
         <div className="text-md font-semibold">Groups</div>
-        <button className="outline-btn py-1">
+        <button
+          className="outline-btn py-1"
+          onClick={() => setIsCreateGroupDialogOpen(true)}
+        >
           <Plus />
         </button>
       </div>
-      <ul className="flex flex-col gap-2">
-        {organizedGroups.map((group) => {
-          return (
-            <li key={group.group.$id}>
-              <Group group={group} />
-            </li>
-          );
-        })}
-      </ul>
+      <GroupList groups={groups} />
+      <Transition appear show={isCreateGroupDialogOpen} as={Fragment}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={() => setIsCreateGroupDialogOpen(false)}
+        >
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6 text-gray-900"
+                  >
+                    Add group
+                  </Dialog.Title>
+                  <div className="mt-3">
+                    <GroupForm groups={groups} onSubmit={handleGroupSubmit} />
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
     </div>
   );
 }
