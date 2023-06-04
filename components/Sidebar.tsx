@@ -23,9 +23,11 @@ import GroupList, { Group } from "./GroupList";
 export default function Sidebar({
   groups,
   setGroups,
+  setResumeGroupFilter,
 }: {
   groups: Group[];
   setGroups: Dispatch<SetStateAction<Group[]>>;
+  setResumeGroupFilter: Dispatch<SetStateAction<string | null>>;
 }) {
   const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
 
@@ -69,7 +71,7 @@ export default function Sidebar({
         </button>
       </div>
 
-      <GroupList groups={groups} />
+      <GroupList groups={groups} setResumeGroupFilter={setResumeGroupFilter} />
       <Transition appear show={isCreateGroupDialogOpen} as={Fragment}>
         <Dialog
           as="div"

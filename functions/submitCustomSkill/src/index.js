@@ -45,7 +45,6 @@ module.exports = async function (req, res) {
     );
 
     // if true return document
-    console.log("skills", skills);
 
     if (skills.total > 0) res.json(skills.documents[0]);
 
@@ -58,7 +57,6 @@ module.exports = async function (req, res) {
     );
     res.json(customSkill);
   }
-  console.log("hello");
   res.json({
     areDevelopersAwesome: true,
   });

@@ -10,16 +10,12 @@ import React, {
   Fragment,
   Dispatch,
   SetStateAction,
+  MouseEventHandler,
 } from "react";
 import {
   AiFillCaretDown as Down,
   AiFillCaretRight as Right,
 } from "react-icons/ai";
-import { FaPlus as Plus } from "react-icons/fa";
-import Spinner from "./Spinner";
-import GroupForm, { SubmitFunction } from "./GroupForm";
-import { toast } from "react-toastify";
-import { databases } from "@/libs/appwrite";
 
 export interface OrganizedGroup {
   group: Group;
@@ -31,10 +27,16 @@ export type Group = Models.Document & {
   parentGroupId?: string;
 };
 
-const Group = ({ group }: { group: OrganizedGroup }) => {
+const Group = ({
+  group,
+  filterGroup,
+}: {
+  group: OrganizedGroup;
+  filterGroup: (id: string | null) => React.MouseEventHandler<HTMLDivElement>;
+}) => {
   const [subgroupOpen, setSubgroupOpen] = useState(false);
   return (
-    <div>
+    <div onClick={filterGroup(group.group.$id)}>
       <div className="px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer flex items-center gap-2">
         <button onClick={() => setSubgroupOpen(!subgroupOpen)}>
           {subgroupOpen ? <Down size={12} /> : <Right size={12} />}
@@ -47,7 +49,7 @@ const Group = ({ group }: { group: OrganizedGroup }) => {
         <ul className="flex flex-col gap-2 mt-2">
           {group.subgroups.map((group, idx) => (
             <li key={group.group.$id} className="pl-4">
-              <Group group={group} />
+              <Group group={group} filterGroup={filterGroup} />
             </li>
           ))}
         </ul>
@@ -77,17 +79,35 @@ function organizeGroups(groups: Group[], parentId?: string): OrganizedGroup[] {
   return organizedGroups;
 }
 
-export default function GroupList({ groups }: { groups: Group[] }) {
+export default function GroupList({
+  groups,
+  setResumeGroupFilter,
+}: {
+  groups: Group[];
+  setResumeGroupFilter: Dispatch<SetStateAction<string | null>>;
+}) {
   const [isGroupsOpen, setIsGroupsOpen] = useState(false);
   const organizedGroups = useMemo(() => {
     return organizeGroups(groups);
   }, [groups]);
 
+  const filterGroup = (id: string | null) => {
+    const handleFilterClick: MouseEventHandler<HTMLDivElement> = (e) => {
+      e.stopPropagation();
+      setResumeGroupFilter(id);
+    };
+
+    return handleFilterClick;
+  };
+
   return (
     <ul className="flex flex-col gap-2">
       <li>
         <div>
-          <div className="px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer flex items-center gap-2">
+          <div
+            className="px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer flex items-center gap-2"
+            onClick={filterGroup(null)}
+          >
             <button onClick={() => setIsGroupsOpen(!isGroupsOpen)}>
               {isGroupsOpen ? <Down size={12} /> : <Right size={12} />}
             </button>
@@ -100,7 +120,7 @@ export default function GroupList({ groups }: { groups: Group[] }) {
               {organizedGroups.map((group) => {
                 return (
                   <li key={group.group.$id} className="pl-4">
-                    <Group group={group} />
+                    <Group group={group} filterGroup={filterGroup} />
                   </li>
                 );
               })}

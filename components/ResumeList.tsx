@@ -20,6 +20,7 @@ export type Resume = Models.Document & {
   roleIds: string[];
   industryIds: string[];
   file: Models.File | null;
+  groupId: string | null;
 };
 
 export default function ResumeList({

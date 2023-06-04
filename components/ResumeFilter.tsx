@@ -32,6 +32,19 @@ export default function ResumeFilter({
   >([]);
   const [roleCheckboxes, setRoleCheckboxes] = useState<Checkbox<Role>[]>([]);
 
+  const resetFilters = () => {
+    setTitleSearch("");
+    setSkillCheckboxes((prev) =>
+      prev.map((box) => ({ ...box, checked: false }))
+    );
+    setIndustryCheckboxes((prev) =>
+      prev.map((box) => ({ ...box, checked: false }))
+    );
+    setRoleCheckboxes((prev) =>
+      prev.map((box) => ({ ...box, checked: false }))
+    );
+  };
+
   useEffect(() => {
     const skillCheckboxes: Checkbox<Skill>[] = skills.map((skill) => ({
       key: skill.$id,

@@ -22,9 +22,38 @@ export default function AppPage() {
   const [filteredResumes, setFilteredResumes] = useState<Resume[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
 
+  // FILTERS
+  const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
+  const [selectedRoleIds, setSelectedRoleIds] = useState<string[]>([]);
+  const [selectedIndustryIds, setSelectedIndustryIds] = useState<string[]>([]);
+  const [titleFilter, setTitleFilter] = useState("");
   const [resumeGroupFilter, setResumeGroupFilter] = useState<string | null>(
     null
   );
+
+  useEffect(() => {
+    setFilteredResumes((prev) =>
+      resumes.filter((res) => {
+        return (
+          (resumeGroupFilter === null || res.groupId === resumeGroupFilter) &&
+          res.title.toLowerCase().includes(titleFilter.toLowerCase()) &&
+          (selectedSkillIds.length === 0 ||
+            res.skillIds.some((id) => selectedSkillIds.includes(id))) &&
+          (selectedRoleIds.length === 0 ||
+            res.roleIds.some((id) => selectedRoleIds.includes(id))) &&
+          (selectedIndustryIds.length === 0 ||
+            res.industryIds.some((id) => selectedIndustryIds.includes(id)))
+        );
+      })
+    );
+  }, [
+    resumeGroupFilter,
+    selectedIndustryIds,
+    selectedRoleIds,
+    selectedSkillIds,
+    titleFilter,
+    resumes,
+  ]);
 
   const approvedSkills = useMemo(
     () => skills.filter((item) => item.approved),
@@ -129,26 +158,19 @@ export default function AppPage() {
       .filter((box) => box.checked)
       .map((box) => box.item.$id);
 
-    console.log(resumes[1], checkedSkillIds);
-
-    setFilteredResumes((prev) =>
-      resumes.filter((res) => {
-        return (
-          res.title.toLowerCase().includes(titleFilter.toLowerCase()) &&
-          (checkedSkillIds.length === 0 ||
-            res.skillIds.some((id) => checkedSkillIds.includes(id))) &&
-          (checkedRoleIds.length === 0 ||
-            res.roleIds.some((id) => checkedRoleIds.includes(id))) &&
-          (checkedIndustryIds.length === 0 ||
-            res.industryIds.some((id) => checkedIndustryIds.includes(id)))
-        );
-      })
-    );
+    setTitleFilter(titleFilter);
+    setSelectedSkillIds(checkedSkillIds);
+    setSelectedRoleIds(checkedRoleIds);
+    setSelectedIndustryIds(checkedIndustryIds);
   };
 
   return (
     <div className="bg-primary-main overflow-hidden h-full">
-      <Sidebar groups={groups} setGroups={setGroups} />
+      <Sidebar
+        groups={groups}
+        setGroups={setGroups}
+        setResumeGroupFilter={setResumeGroupFilter}
+      />
       <div className="ml-sidebar-w-open h-full">
         <div className="p-4 h-full">
           <div className="mb-4">
