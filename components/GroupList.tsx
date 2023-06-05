@@ -81,7 +81,7 @@ const Group = ({
             : ""
         }`}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full text-ellipsis overflow-hidden whitespace-nowrap">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -96,7 +96,7 @@ const Group = ({
         </div>
         <Menu as="div" className="relative hidden group-hover:block ">
           <Menu.Button
-            className="block hover:text-secondary-main"
+            className="block hover:text-gray-300"
             onClick={(e) => e.stopPropagation()}
           >
             <More />
