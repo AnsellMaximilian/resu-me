@@ -12,10 +12,12 @@ export default function GroupForm({
   groups,
   onSubmit,
   groupToEdit,
+  resumeGroupFilter,
 }: {
   groups: Group[];
   onSubmit: SubmitFunction;
   groupToEdit: Group | null;
+  resumeGroupFilter: string | null;
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
@@ -38,8 +40,10 @@ export default function GroupForm({
       setSelectedParentGroupId(
         groupToEdit.parentGroupId ? groupToEdit.parentGroupId : "none"
       );
+    } else if (resumeGroupFilter) {
+      setSelectedParentGroupId(resumeGroupFilter ? resumeGroupFilter : "none");
     }
-  }, [groupToEdit]);
+  }, [groupToEdit, resumeGroupFilter]);
 
   const filteredGroups = useMemo(() => {
     if (groupToEdit) {

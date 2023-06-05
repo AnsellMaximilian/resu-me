@@ -142,6 +142,7 @@ export default function Sidebar({
           groups={groups}
           onSubmit={!groupToEdit ? handleGroupSubmit : handleGroupUpdate}
           groupToEdit={groupToEdit}
+          resumeGroupFilter={resumeGroupFilter}
         />
       </Dialog>
     </div>
