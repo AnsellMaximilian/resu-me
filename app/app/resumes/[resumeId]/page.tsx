@@ -17,6 +17,7 @@ import {
 } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Group } from "@/components/GroupList";
 
 export default function ResumePage({
   params: { resumeId },
@@ -28,7 +29,7 @@ export default function ResumePage({
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [file, setFile] = useState<Models.File>();
-
+  const [group, setGroup] = useState<Group | null>(null);
   const router = useRouter();
 
   const handleDelete = async () => {
@@ -88,6 +89,19 @@ export default function ResumePage({
 
           setRoles(roles.documents as Role[]);
         }
+        if (resume.groupId) {
+          try {
+            const group = await databases.getDocument(
+              process.env.NEXT_PUBLIC_DATABASE_ID as string,
+              process.env.NEXT_PUBLIC_GROUP_COLLECTION_ID as string,
+              resume.groupId
+            );
+
+            setGroup(group as Group);
+          } catch (error) {
+            console.log("Group not found.");
+          }
+        }
 
         const file = await storage.getFile(
           process.env.NEXT_PUBLIC_BUCKET_ID as string,
@@ -112,7 +126,12 @@ export default function ResumePage({
         <section>
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 bg-white p-4 shadow-md rounded-md flex items-center justify-between">
-              <h1 className="font-bold text-2xl">{resume.title}</h1>
+              <div>
+                <h2 className="text-gray-500">
+                  {group ? group.name : "Not assigned to any group."}
+                </h2>
+                <h1 className="font-bold text-2xl">{resume.title}</h1>
+              </div>
               <Link
                 href={`/app/resumes/${resumeId}/edit`}
                 className="outline-btn flex gap-2 items-center"
