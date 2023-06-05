@@ -63,7 +63,6 @@ export default function EditResumePage({
       )) as Resume;
       setTitle(resume.title);
       setDescription(resume.description);
-      setSelectedGroupId(resume.groupId === null ? "none" : resume.groupId);
 
       const skills = (
         await databases.listDocuments(
@@ -126,6 +125,12 @@ export default function EditResumePage({
       ).documents as Group[];
 
       setGroups(groups);
+
+      // Group ID
+      const resumeGroup = groups.find((g) => g.$id === resume.groupId);
+      if (resumeGroup) {
+        setSelectedGroupId(resume.groupId === null ? "none" : resume.groupId);
+      }
     })();
   }, []);
 
