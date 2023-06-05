@@ -19,6 +19,8 @@ import {
   AiFillCaretRight as Right,
 } from "react-icons/ai";
 import { RiMoreLine as More } from "react-icons/ri";
+import { getAllGroupIds, organizeGroups } from "@/helpers";
+import { functions } from "@/libs/appwrite";
 export interface OrganizedGroup {
   group: Group;
   subgroups: OrganizedGroup[];
@@ -31,15 +33,44 @@ export type Group = Models.Document & {
 
 const Group = ({
   group,
-  filterGroup,
+  setGroups,
+  setResumeGroupFilter,
 }: {
   group: OrganizedGroup;
-  filterGroup: (id: string | null) => React.MouseEventHandler<HTMLDivElement>;
+  setResumeGroupFilter: Dispatch<SetStateAction<string | null>>;
+
+  setGroups: Dispatch<SetStateAction<Group[]>>;
 }) => {
   const [subgroupOpen, setSubgroupOpen] = useState(false);
-  const handleDelete = () => {};
+  const handleDelete = async (group: OrganizedGroup) => {
+    const ids = getAllGroupIds(group);
+    const res = await functions.createExecution(
+      process.env.NEXT_PUBLIC_FUNCTION_ID_DELETE_GROUP as string,
+      JSON.stringify({ groupIds: ids })
+    );
+    const { successes } = JSON.parse(res.response) as {
+      successes: string[];
+      fails: string[];
+    };
+    console.log(JSON.parse(res.response));
+    setGroups((prev) => prev.filter((group) => !successes.includes(group.$id)));
+    setResumeGroupFilter((prev) => {
+      if (prev !== null && successes.includes(prev)) {
+        return null;
+      } else {
+        return prev;
+      }
+    });
+  };
   return (
-    <div onClick={filterGroup(group.group.$id)} className="">
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+
+        setResumeGroupFilter(group.group.$id);
+      }}
+      className=""
+    >
       <div className="group flex items-center justify-between px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer">
         <div className="flex items-center gap-2">
           <button
@@ -64,7 +95,10 @@ const Group = ({
           <Menu.Items className="absolute text-sm z-50 right-0 shadow-lg origin-top-right bg-white mt-1 w-32 ring-1 ring-gray-200 rounded-lg overflow-hidden">
             <Menu.Item>
               <button
-                onClick={() => {}}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(group);
+                }}
                 className="flex gap-2 items-center px-3 py-2 hover:text-black transition-all duration-100 w-full text-left hover:bg-primary-main"
               >
                 <Trash size={10} className="text-gray-600" /> Delete
@@ -82,7 +116,11 @@ const Group = ({
         <ul className="flex flex-col gap-2 mt-2">
           {group.subgroups.map((group, idx) => (
             <li key={group.group.$id} className="pl-4">
-              <Group group={group} filterGroup={filterGroup} />
+              <Group
+                setResumeGroupFilter={setResumeGroupFilter}
+                group={group}
+                setGroups={setGroups}
+              />
             </li>
           ))}
         </ul>
@@ -91,47 +129,19 @@ const Group = ({
   );
 };
 
-function organizeGroups(groups: Group[], parentId?: string): OrganizedGroup[] {
-  const organizedGroups: OrganizedGroup[] = [];
-
-  // Find all groups with the specified parentId
-  const filteredGroups = groups.filter((group) =>
-    parentId ? group.parentGroupId === parentId : !group.parentGroupId
-  );
-
-  // Iterate over each filtered group and organize its subgroups recursively
-  for (const group of filteredGroups) {
-    const organizedGroup: OrganizedGroup = {
-      group,
-      subgroups: organizeGroups(groups, group.$id), // Recursively organize subgroups
-    };
-
-    organizedGroups.push(organizedGroup);
-  }
-
-  return organizedGroups;
-}
-
 export default function GroupList({
   groups,
   setResumeGroupFilter,
+  setGroups,
 }: {
   groups: Group[];
   setResumeGroupFilter: Dispatch<SetStateAction<string | null>>;
+  setGroups: Dispatch<SetStateAction<Group[]>>;
 }) {
   const [isGroupsOpen, setIsGroupsOpen] = useState(false);
   const organizedGroups = useMemo(() => {
     return organizeGroups(groups);
   }, [groups]);
-
-  const filterGroup = (id: string | null) => {
-    const handleFilterClick: MouseEventHandler<HTMLDivElement> = (e) => {
-      e.stopPropagation();
-      setResumeGroupFilter(id);
-    };
-
-    return handleFilterClick;
-  };
 
   return (
     <ul className="flex flex-col gap-2">
@@ -139,7 +149,10 @@ export default function GroupList({
         <div>
           <div
             className="px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer flex items-center gap-2"
-            onClick={filterGroup(null)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setResumeGroupFilter(null);
+            }}
           >
             <button
               onClick={(e) => {
@@ -158,7 +171,11 @@ export default function GroupList({
               {organizedGroups.map((group) => {
                 return (
                   <li key={group.group.$id} className="pl-4">
-                    <Group group={group} filterGroup={filterGroup} />
+                    <Group
+                      setResumeGroupFilter={setResumeGroupFilter}
+                      group={group}
+                      setGroups={setGroups}
+                    />
                   </li>
                 );
               })}

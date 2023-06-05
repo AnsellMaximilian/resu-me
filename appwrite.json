@@ -61,6 +61,21 @@
             "events": [],
             "schedule": "",
             "timeout": 15
+        },
+        {
+            "$id": "647d53081f331157e174",
+            "name": "deleteGroup",
+            "runtime": "node-16.0",
+            "path": "functions/deleteGroup",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
         }
     ]
 }

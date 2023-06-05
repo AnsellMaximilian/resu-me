@@ -71,7 +71,11 @@ export default function Sidebar({
         </button>
       </div>
 
-      <GroupList groups={groups} setResumeGroupFilter={setResumeGroupFilter} />
+      <GroupList
+        groups={groups}
+        setResumeGroupFilter={setResumeGroupFilter}
+        setGroups={setGroups}
+      />
       <Transition appear show={isCreateGroupDialogOpen} as={Fragment}>
         <Dialog
           as="div"
