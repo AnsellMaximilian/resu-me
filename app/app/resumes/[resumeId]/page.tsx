@@ -9,6 +9,7 @@ import { Models, Query } from "appwrite";
 import { BsEyeFill as Eye } from "react-icons/bs";
 import { ImArrowDown as Download } from "react-icons/im";
 import { MdModeEditOutline as Edit } from "react-icons/md";
+import { AiOutlineLoading3Quarters as Spinner } from "react-icons/ai";
 
 import {
   FaFilePdf as PDF,
@@ -115,11 +116,13 @@ export default function ResumePage({
     })();
   }, [resumeId]);
 
-  if (file && resume) {
-    const url = storage.getFileDownload(
-      process.env.NEXT_PUBLIC_BUCKET_ID as string,
-      file.$id
-    );
+  if (resume) {
+    const url = file
+      ? storage.getFileDownload(
+          process.env.NEXT_PUBLIC_BUCKET_ID as string,
+          file.$id
+        )
+      : undefined;
 
     return (
       <div className="p-4">
@@ -200,43 +203,56 @@ export default function ResumePage({
               </div>
             </div>
             <div className="col-span-12 md:col-span-6 bg-white p-4 shadow-md rounded-md">
-              <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 col-span-12 md:col-span-6">
-                <div className="sm:col-span-2">
-                  <div className="mb-2 flex gap-2 items-center">
-                    <div className="font-semibold text-gray-900">
-                      Resume File
+              {file && url ? (
+                <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 col-span-12 md:col-span-6">
+                  <div className="sm:col-span-2">
+                    <div className="mb-2 flex gap-2 items-center">
+                      <div className="font-semibold text-gray-900">
+                        Resume File
+                      </div>
+                      <div className="text-gray-500 text-xs">{file.name}</div>
                     </div>
-                    <div className="text-gray-500 text-xs">{file.name}</div>
+                    <div className="w-72 h-64 aspect-square flex--center">
+                      <iframe
+                        src={
+                          url.href.replace("download", "view") + "#toolbar=0"
+                        }
+                        className="w-full h-full"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <iframe src={url.href.replace("download", "view")} />
-                    <div></div>
+                  <div className="sm:col-span-2">
+                    <div className="flex gap-4 flex-wrap">
+                      <a
+                        href={url.href}
+                        className="primary-btn flex gap-2 items-center"
+                      >
+                        <Download /> <span>Download</span>
+                      </a>
+                      <button
+                        className="btn danger-btn flex gap-2 items-center"
+                        onClick={handleDelete}
+                      >
+                        <Trash /> <span>Delete</span>
+                      </button>
+                      <a
+                        className="outline-btn flex gap-2 items-center"
+                        href={url.href.replace("download", "view")}
+                        target="_blank"
+                      >
+                        <Eye /> <span>View File</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
-                <div className="sm:col-span-2">
-                  <div className="flex gap-4 flex-wrap">
-                    <a
-                      href={url.href}
-                      className="primary-btn flex gap-2 items-center"
-                    >
-                      <Download /> <span>Download</span>
-                    </a>
-                    <button
-                      className="btn danger-btn flex gap-2 items-center"
-                      onClick={handleDelete}
-                    >
-                      <Trash /> <span>Delete</span>
-                    </button>
-                    <a
-                      className="outline-btn flex gap-2 items-center"
-                      href={url.href.replace("download", "view")}
-                      target="_blank"
-                    >
-                      <Eye /> <span>View File</span>
-                    </a>
-                  </div>
+              ) : (
+                <div className="col-span12 flex--center h-full">
+                  <Spinner
+                    size={64}
+                    className="animate-spin text-secondary-main"
+                  />
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </section>
