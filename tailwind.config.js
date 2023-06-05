@@ -21,6 +21,7 @@ module.exports = {
           main: "#2185D5",
           dark: "#226eab",
           light: "#3a9ff0",
+          lighter: "#96d1ff",
         },
       },
       backgroundImage: {

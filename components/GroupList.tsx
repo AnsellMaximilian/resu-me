@@ -35,10 +35,11 @@ const Group = ({
   group,
   setGroups,
   setResumeGroupFilter,
+  resumeGroupFilter,
 }: {
   group: OrganizedGroup;
   setResumeGroupFilter: Dispatch<SetStateAction<string | null>>;
-
+  resumeGroupFilter: string | null;
   setGroups: Dispatch<SetStateAction<Group[]>>;
 }) => {
   const [subgroupOpen, setSubgroupOpen] = useState(false);
@@ -62,16 +63,22 @@ const Group = ({
       }
     });
   };
+
   return (
     <div
       onClick={(e) => {
         e.stopPropagation();
-
         setResumeGroupFilter(group.group.$id);
       }}
       className=""
     >
-      <div className="group flex items-center justify-between px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer">
+      <div
+        className={`group flex items-center justify-between px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer ${
+          resumeGroupFilter === group.group.$id
+            ? "bg-secondary-lighter hover:bg-secondary-light"
+            : ""
+        }`}
+      >
         <div className="flex items-center gap-2">
           <button
             onClick={(e) => {
@@ -117,6 +124,7 @@ const Group = ({
           {group.subgroups.map((group, idx) => (
             <li key={group.group.$id} className="pl-4">
               <Group
+                resumeGroupFilter={resumeGroupFilter}
                 setResumeGroupFilter={setResumeGroupFilter}
                 group={group}
                 setGroups={setGroups}
@@ -133,22 +141,27 @@ export default function GroupList({
   groups,
   setResumeGroupFilter,
   setGroups,
+  resumeGroupFilter,
 }: {
   groups: Group[];
   setResumeGroupFilter: Dispatch<SetStateAction<string | null>>;
   setGroups: Dispatch<SetStateAction<Group[]>>;
+  resumeGroupFilter: string | null;
 }) {
   const [isGroupsOpen, setIsGroupsOpen] = useState(false);
   const organizedGroups = useMemo(() => {
     return organizeGroups(groups);
   }, [groups]);
-
   return (
     <ul className="flex flex-col gap-2">
       <li>
         <div>
           <div
-            className="px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer flex items-center gap-2"
+            className={`px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer flex items-center gap-2 ${
+              resumeGroupFilter === null
+                ? "bg-secondary-lighter hover:bg-secondary-light"
+                : ""
+            }`}
             onClick={(e) => {
               e.stopPropagation();
               setResumeGroupFilter(null);
@@ -172,6 +185,7 @@ export default function GroupList({
                 return (
                   <li key={group.group.$id} className="pl-4">
                     <Group
+                      resumeGroupFilter={resumeGroupFilter}
                       setResumeGroupFilter={setResumeGroupFilter}
                       group={group}
                       setGroups={setGroups}

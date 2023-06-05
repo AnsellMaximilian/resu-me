@@ -24,10 +24,12 @@ export default function Sidebar({
   groups,
   setGroups,
   setResumeGroupFilter,
+  resumeGroupFilter,
 }: {
   groups: Group[];
   setGroups: Dispatch<SetStateAction<Group[]>>;
   setResumeGroupFilter: Dispatch<SetStateAction<string | null>>;
+  resumeGroupFilter: string | null;
 }) {
   const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
 
@@ -75,6 +77,7 @@ export default function Sidebar({
         groups={groups}
         setResumeGroupFilter={setResumeGroupFilter}
         setGroups={setGroups}
+        resumeGroupFilter={resumeGroupFilter}
       />
       <Transition appear show={isCreateGroupDialogOpen} as={Fragment}>
         <Dialog

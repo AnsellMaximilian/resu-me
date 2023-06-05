@@ -170,6 +170,7 @@ export default function AppPage() {
         groups={groups}
         setGroups={setGroups}
         setResumeGroupFilter={setResumeGroupFilter}
+        resumeGroupFilter={resumeGroupFilter}
       />
       <div className="ml-sidebar-w-open h-full">
         <div className="p-4 h-full">
