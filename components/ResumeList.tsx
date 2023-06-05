@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import ResumeCard from "./ResumeCard";
 import { toast } from "react-toastify";
+import Skeleton from "react-loading-skeleton";
 
 export type Resume = Models.Document & {
   title: string;
@@ -26,9 +27,11 @@ export type Resume = Models.Document & {
 export default function ResumeList({
   resumes,
   handleDelete,
+  isLoading,
 }: {
   resumes: Resume[];
   handleDelete: (resumeId: string) => Promise<boolean>;
+  isLoading: boolean;
 }) {
   return (
     <section>
@@ -41,16 +44,22 @@ export default function ResumeList({
           <span>Upload</span> <Plus />
         </Link>
       </header>
-      {resumes.length > 0 && (
-        <ul className="flex gap-4 flex-wrap">
-          {resumes.map((resume) => (
-            <ResumeCard
-              key={resume.$id}
-              resume={resume}
-              handleDelete={handleDelete}
-            />
-          ))}
-        </ul>
+      {!isLoading ? (
+        resumes.length > 0 ? (
+          <ul className="flex gap-4 flex-wrap">
+            {resumes.map((resume) => (
+              <ResumeCard
+                key={resume.$id}
+                resume={resume}
+                handleDelete={handleDelete}
+              />
+            ))}
+          </ul>
+        ) : (
+          <span>Empty</span>
+        )
+      ) : (
+        <Skeleton count={5} height={40} />
       )}
     </section>
   );

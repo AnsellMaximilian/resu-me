@@ -4,7 +4,7 @@ import client, { account, databases, storage } from "@/libs/appwrite";
 import { Account, Models } from "appwrite";
 
 import AppHeader from "@/components/AppHeader";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useTransition } from "react";
 import ResumeList, { Resume } from "@/components/ResumeList";
 import { ToastContainer, toast } from "react-toastify";
 import { Popover } from "@headlessui/react";
@@ -14,14 +14,18 @@ import ResumeFilter, { FilterFunction } from "@/components/ResumeFilter";
 import Sidebar from "@/components/Sidebar";
 import { Group } from "@/components/GroupList";
 import { getAllGroupIds, getGroupParents, organizeGroups } from "@/helpers";
+import Skeleton from "react-loading-skeleton";
 
 export default function AppPage() {
+  const [isResumeTransitionPending, startResumeTransition] = useTransition();
+
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [industries, setIndustries] = useState<Industry[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [filteredResumes, setFilteredResumes] = useState<Resume[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // FILTERS
   const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
@@ -35,33 +39,35 @@ export default function AppPage() {
   // const organizedGroups = useMemo(() => organizeGroups(groups), [groups]);
 
   useEffect(() => {
-    setFilteredResumes((prev) =>
-      resumes.filter((res) => {
-        let viableGroupIds: string[] = [];
-        if (resumeGroupFilter !== null) {
-          const selectedGroup = groups.find((g) => g.$id === res.groupId);
+    startResumeTransition(() => {
+      setFilteredResumes((prev) =>
+        resumes.filter((res) => {
+          let viableGroupIds: string[] = [];
+          if (resumeGroupFilter !== null) {
+            const selectedGroup = groups.find((g) => g.$id === res.groupId);
 
-          viableGroupIds = selectedGroup
-            ? [
-                selectedGroup.$id,
-                ...getGroupParents(selectedGroup, groups).map((g) => g.$id),
-              ]
-            : [];
-        }
+            viableGroupIds = selectedGroup
+              ? [
+                  selectedGroup.$id,
+                  ...getGroupParents(selectedGroup, groups).map((g) => g.$id),
+                ]
+              : [];
+          }
 
-        return (
-          (resumeGroupFilter === null ||
-            (res.groupId && viableGroupIds.includes(resumeGroupFilter))) &&
-          res.title.toLowerCase().includes(titleFilter.toLowerCase()) &&
-          (selectedSkillIds.length === 0 ||
-            res.skillIds.some((id) => selectedSkillIds.includes(id))) &&
-          (selectedRoleIds.length === 0 ||
-            res.roleIds.some((id) => selectedRoleIds.includes(id))) &&
-          (selectedIndustryIds.length === 0 ||
-            res.industryIds.some((id) => selectedIndustryIds.includes(id)))
-        );
-      })
-    );
+          return (
+            (resumeGroupFilter === null ||
+              (res.groupId && viableGroupIds.includes(resumeGroupFilter))) &&
+            res.title.toLowerCase().includes(titleFilter.toLowerCase()) &&
+            (selectedSkillIds.length === 0 ||
+              res.skillIds.some((id) => selectedSkillIds.includes(id))) &&
+            (selectedRoleIds.length === 0 ||
+              res.roleIds.some((id) => selectedRoleIds.includes(id))) &&
+            (selectedIndustryIds.length === 0 ||
+              res.industryIds.some((id) => selectedIndustryIds.includes(id)))
+          );
+        })
+      );
+    });
   }, [
     groups,
     resumeGroupFilter,
@@ -134,6 +140,7 @@ export default function AppPage() {
       );
 
       setGroups(groups.documents as Group[]);
+      setIsLoading(false);
     })();
   }, []);
 
@@ -199,7 +206,15 @@ export default function AppPage() {
               onFilter={handleFilter}
             />
           </div>
-          <ResumeList resumes={filteredResumes} handleDelete={handleDelete} />
+          {!isResumeTransitionPending ? (
+            <ResumeList
+              resumes={filteredResumes}
+              handleDelete={handleDelete}
+              isLoading={isLoading}
+            />
+          ) : (
+            <Skeleton count={1} height={72} />
+          )}
           <ToastContainer />
         </div>
       </div>
