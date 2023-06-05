@@ -13,6 +13,7 @@ import CheckBoxList, { Checkbox } from "@/components/CheckBoxList";
 import ResumeFilter, { FilterFunction } from "@/components/ResumeFilter";
 import Sidebar from "@/components/Sidebar";
 import { Group } from "@/components/GroupList";
+import { getAllGroupIds, getGroupParents, organizeGroups } from "@/helpers";
 
 export default function AppPage() {
   const [resumes, setResumes] = useState<Resume[]>([]);
@@ -31,11 +32,26 @@ export default function AppPage() {
     null
   );
 
+  // const organizedGroups = useMemo(() => organizeGroups(groups), [groups]);
+
   useEffect(() => {
     setFilteredResumes((prev) =>
       resumes.filter((res) => {
+        let viableGroupIds: string[] = [];
+        if (resumeGroupFilter !== null) {
+          const selectedGroup = groups.find((g) => g.$id === res.groupId);
+
+          viableGroupIds = selectedGroup
+            ? [
+                selectedGroup.$id,
+                ...getGroupParents(selectedGroup, groups).map((g) => g.$id),
+              ]
+            : [];
+        }
+
         return (
-          (resumeGroupFilter === null || res.groupId === resumeGroupFilter) &&
+          (resumeGroupFilter === null ||
+            (res.groupId && viableGroupIds.includes(resumeGroupFilter))) &&
           res.title.toLowerCase().includes(titleFilter.toLowerCase()) &&
           (selectedSkillIds.length === 0 ||
             res.skillIds.some((id) => selectedSkillIds.includes(id))) &&
@@ -47,6 +63,7 @@ export default function AppPage() {
       })
     );
   }, [
+    groups,
     resumeGroupFilter,
     selectedIndustryIds,
     selectedRoleIds,

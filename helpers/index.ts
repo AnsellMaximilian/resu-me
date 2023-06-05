@@ -34,3 +34,13 @@ export function getAllGroupIds(group: OrganizedGroup): string[] {
 
   return ids;
 }
+
+export function getGroupParents(group: Group, groups: Group[]) {
+  const parents: Group[] = [];
+  for (const g of groups) {
+    if (g.$id === group.parentGroupId) {
+      parents.push(g, ...getGroupParents(g, groups));
+    }
+  }
+  return parents;
+}
