@@ -12,6 +12,7 @@ import {
 import ResumeCard from "./ResumeCard";
 import { toast } from "react-toastify";
 import Skeleton from "react-loading-skeleton";
+import Image from "next/image";
 
 export type Resume = Models.Document & {
   title: string;
@@ -56,7 +57,16 @@ export default function ResumeList({
             ))}
           </ul>
         ) : (
-          <span>Empty</span>
+          <div className="flex flex-col items-center justify-center gap-4">
+            <Image
+              src="/empty.svg"
+              alt="empty"
+              height={632.17383}
+              width={647.63626}
+              className="max-w-full w-64"
+            />
+            <h2 className="text-xl font-medium">It&apos;s Empty Here</h2>
+          </div>
         )
       ) : (
         <Skeleton count={5} height={40} />
