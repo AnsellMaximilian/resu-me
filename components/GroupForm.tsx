@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Spinner from "./Spinner";
 import { Group } from "./GroupList";
 
@@ -11,9 +11,11 @@ export type SubmitFunction = (
 export default function GroupForm({
   groups,
   onSubmit,
+  groupToEdit,
 }: {
   groups: Group[];
   onSubmit: SubmitFunction;
+  groupToEdit: Group | null;
 }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState("");
@@ -29,6 +31,23 @@ export default function GroupForm({
     );
     setIsSubmitting(false);
   };
+
+  useEffect(() => {
+    if (groupToEdit) {
+      setName(groupToEdit.name);
+      setSelectedParentGroupId(
+        groupToEdit.parentGroupId ? groupToEdit.parentGroupId : "none"
+      );
+    }
+  }, [groupToEdit]);
+
+  const filteredGroups = useMemo(() => {
+    if (groupToEdit) {
+      return groups.filter((g) => g.$id !== groupToEdit.$id);
+    }
+    return groups;
+  }, [groupToEdit, groups]);
+
   return (
     <form className="space-y-4 md:space-y-6" action="#" onSubmit={handleSubmit}>
       <div>
@@ -45,7 +64,7 @@ export default function GroupForm({
           className="input"
         >
           <option value="none">None</option>
-          {groups.map((group) => (
+          {filteredGroups.map((group) => (
             <option key={group.$id} value={group.$id}>
               {group.name}
             </option>

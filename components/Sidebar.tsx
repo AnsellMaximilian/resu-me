@@ -1,6 +1,5 @@
 "use client";
 
-import { Dialog, Transition } from "@headlessui/react";
 import { ID, Models } from "appwrite";
 import React, {
   useMemo,
@@ -8,6 +7,7 @@ import React, {
   Fragment,
   Dispatch,
   SetStateAction,
+  useEffect,
 } from "react";
 import {
   AiFillCaretDown as Down,
@@ -19,6 +19,7 @@ import GroupForm, { SubmitFunction } from "./GroupForm";
 import { toast } from "react-toastify";
 import { databases } from "@/libs/appwrite";
 import GroupList, { Group } from "./GroupList";
+import Dialog from "./Dialog";
 
 export default function Sidebar({
   groups,
@@ -32,6 +33,7 @@ export default function Sidebar({
   resumeGroupFilter: string | null;
 }) {
   const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
+  const [groupToEdit, setGroupToEdit] = useState<Group | null>(null);
 
   const handleGroupSubmit: SubmitFunction = async (name, parentGroupId) => {
     try {
@@ -61,6 +63,55 @@ export default function Sidebar({
     }
   };
 
+  const handleGroupUpdate: SubmitFunction = async (name, parentGroupId) => {
+    if (groupToEdit) {
+      try {
+        if (!name) throw new Error("Name field is required.");
+        if (name.length > 20) throw new Error("Maximum is 20 characters.");
+
+        const newGroup = (await databases.updateDocument(
+          process.env.NEXT_PUBLIC_DATABASE_ID as string,
+          process.env.NEXT_PUBLIC_GROUP_COLLECTION_ID as string,
+          groupToEdit.$id,
+          {
+            name,
+            parentGroupId,
+          }
+        )) as Group;
+
+        setIsCreateGroupDialogOpen(false);
+        setGroups((prev) =>
+          prev.map((group) => {
+            if (group.$id === newGroup.$id) {
+              return newGroup;
+            }
+            return group;
+          })
+        );
+
+        toast.success("Group updated.");
+      } catch (error: any) {
+        if (Object.hasOwn(error, "message")) {
+          toast.error(error.message);
+        } else {
+          toast.error("Unknown error");
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (groupToEdit !== null) {
+      setIsCreateGroupDialogOpen(true);
+    }
+  }, [groupToEdit]);
+
+  useEffect(() => {
+    if (isCreateGroupDialogOpen === false) {
+      setGroupToEdit(null);
+    }
+  }, [isCreateGroupDialogOpen]);
+
   return (
     <div className="w-sidebar-w-open sidebar bg-white fixed left-0 border-r border-gray-200 p-4">
       <div className="mb-4 flex--between">
@@ -78,52 +129,21 @@ export default function Sidebar({
         setResumeGroupFilter={setResumeGroupFilter}
         setGroups={setGroups}
         resumeGroupFilter={resumeGroupFilter}
+        setGroupToEdit={setGroupToEdit}
       />
-      <Transition appear show={isCreateGroupDialogOpen} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-10"
-          onClose={() => setIsCreateGroupDialogOpen(false)}
-        >
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
-                    Add group
-                  </Dialog.Title>
-                  <div className="mt-3">
-                    <GroupForm groups={groups} onSubmit={handleGroupSubmit} />
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
+      <Dialog
+        onClose={() => {
+          setIsCreateGroupDialogOpen(false);
+        }}
+        title={!groupToEdit ? "Add Group" : "Edit Group"}
+        open={isCreateGroupDialogOpen}
+      >
+        <GroupForm
+          groups={groups}
+          onSubmit={!groupToEdit ? handleGroupSubmit : handleGroupUpdate}
+          groupToEdit={groupToEdit}
+        />
+      </Dialog>
     </div>
   );
 }

@@ -36,9 +36,12 @@ const Group = ({
   setGroups,
   setResumeGroupFilter,
   resumeGroupFilter,
+  setGroupToEdit,
 }: {
   group: OrganizedGroup;
   setResumeGroupFilter: Dispatch<SetStateAction<string | null>>;
+  setGroupToEdit: Dispatch<React.SetStateAction<Group | null>>;
+
   resumeGroupFilter: string | null;
   setGroups: Dispatch<SetStateAction<Group[]>>;
 }) => {
@@ -53,7 +56,6 @@ const Group = ({
       successes: string[];
       fails: string[];
     };
-    console.log(JSON.parse(res.response));
     setGroups((prev) => prev.filter((group) => !successes.includes(group.$id)));
     setResumeGroupFilter((prev) => {
       if (prev !== null && successes.includes(prev)) {
@@ -112,7 +114,13 @@ const Group = ({
               </button>
             </Menu.Item>
             <Menu.Item>
-              <button className="flex gap-2 items-center px-3 py-2 hover:text-black transition-all duration-100 w-full text-left hover:bg-primary-main">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setGroupToEdit(group.group);
+                }}
+                className="flex gap-2 items-center px-3 py-2 hover:text-black transition-all duration-100 w-full text-left hover:bg-primary-main"
+              >
                 <Edit size={10} className="text-gray-600" /> Edit
               </button>
             </Menu.Item>
@@ -128,6 +136,7 @@ const Group = ({
                 setResumeGroupFilter={setResumeGroupFilter}
                 group={group}
                 setGroups={setGroups}
+                setGroupToEdit={setGroupToEdit}
               />
             </li>
           ))}
@@ -142,10 +151,12 @@ export default function GroupList({
   setResumeGroupFilter,
   setGroups,
   resumeGroupFilter,
+  setGroupToEdit,
 }: {
   groups: Group[];
   setResumeGroupFilter: Dispatch<SetStateAction<string | null>>;
   setGroups: Dispatch<SetStateAction<Group[]>>;
+  setGroupToEdit: Dispatch<React.SetStateAction<Group | null>>;
   resumeGroupFilter: string | null;
 }) {
   const [isGroupsOpen, setIsGroupsOpen] = useState(false);
@@ -189,6 +200,7 @@ export default function GroupList({
                       setResumeGroupFilter={setResumeGroupFilter}
                       group={group}
                       setGroups={setGroups}
+                      setGroupToEdit={setGroupToEdit}
                     />
                   </li>
                 );
