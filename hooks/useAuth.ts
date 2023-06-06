@@ -2,7 +2,7 @@ import appwriteClient, { account, teams } from "@/libs/appwrite";
 import { Models } from "appwrite";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-type UserObject = Models.User<Models.Preferences> & {
+export type UserObject = Models.User<Models.Preferences> & {
   isAdmin: boolean;
 };
 
