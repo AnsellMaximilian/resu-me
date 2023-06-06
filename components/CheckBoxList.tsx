@@ -39,7 +39,12 @@ export default function CheckBoxList<T>({
         setSubmitting(true);
         if (!customValue) throw new Error("Cannot be empty.");
         // Check if it already exists
-        if (items.find((box) => renderLabel(box) === customValue)) {
+        if (
+          items.find(
+            (box) =>
+              renderLabel(box).toLowerCase() === customValue.toLowerCase()
+          )
+        ) {
           throw new Error("That value already exists.");
         }
         setCustomValue("");
