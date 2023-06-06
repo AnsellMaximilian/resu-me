@@ -5,6 +5,7 @@ import {
   Databases,
   Functions,
   Storage,
+  Teams,
 } from "appwrite";
 const client = new Client();
 
@@ -17,5 +18,6 @@ export const storage = new Storage(client);
 export const functions = new Functions(client);
 export const databases = new Databases(client);
 export const avatars = new Avatars(client);
+export const teams = new Teams(client);
 
 export default client;

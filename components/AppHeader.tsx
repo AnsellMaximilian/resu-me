@@ -9,6 +9,7 @@ import Skeleton from "react-loading-skeleton";
 import Image from "next/image";
 import { avatars } from "@/libs/appwrite";
 import { BiLogOut as LogoutIcon } from "react-icons/bi";
+import { MdAdminPanelSettings as AdminLogo } from "react-icons/md";
 
 export default function AppHeader() {
   const { currentAccount, logout } = useAuth();
@@ -47,15 +48,17 @@ export default function AppHeader() {
               </div>
             </Menu.Button>
             <Menu.Items className="absolute text-sm z-50 right-0 shadow-lg origin-top-right bg-white mt-1 w-48 ring-1 ring-gray-200 rounded-lg overflow-hidden flex flex-col">
-              {/* <Menu.Item>
-                <button>Test</button>
-              </Menu.Item>
-              <Menu.Item>
-                <button>Test</button>
-              </Menu.Item>
-              <Menu.Item>
-                <button>Test</button>
-              </Menu.Item> */}
+              {currentAccount.isAdmin && (
+                <Menu.Item>
+                  <button
+                    // onClick={logout}
+                    className="flex items-center gap-2 p-2 hover:bg-primary-main border-t border-gray-200"
+                  >
+                    <AdminLogo /> <span>Admin Page</span>
+                  </button>
+                </Menu.Item>
+              )}
+
               <Menu.Item>
                 <button
                   onClick={logout}
