@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Group } from "@/components/GroupList";
 import Image from "next/image";
+import Skeleton from "react-loading-skeleton";
 
 export default function ResumePage({
   params: { resumeId },
@@ -287,5 +288,10 @@ export default function ResumePage({
     );
   }
 
-  return <div>Loading</div>;
+  return (
+    <div className="p-4">
+      <Skeleton height={64} />
+      <Skeleton count={16} />
+    </div>
+  );
 }
