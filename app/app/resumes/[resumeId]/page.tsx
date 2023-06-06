@@ -136,12 +136,20 @@ export default function ResumePage({
                 </h2>
                 <h1 className="font-bold text-2xl">{resume.title}</h1>
               </div>
-              <Link
-                href={`/app/resumes/${resumeId}/edit`}
-                className="outline-btn flex gap-2 items-center"
-              >
-                <Edit /> <span>Edit</span>
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={`/app/resumes/${resumeId}/edit`}
+                  className="outline-btn flex gap-2 items-center text-base"
+                >
+                  <Edit /> <span>Edit</span>
+                </Link>
+                <button
+                  className="btn danger-btn flex gap-2 items-center"
+                  onClick={handleDelete}
+                >
+                  <Trash /> <span>Delete</span>
+                </button>
+              </div>
             </div>
             <div className="col-span-12 md:col-span-6 bg-white p-4 shadow-md rounded-md">
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-6 col-span-12 md:col-span-6">
@@ -250,19 +258,16 @@ export default function ResumePage({
                       >
                         <Download /> <span>Download</span>
                       </a>
-                      <button
-                        className="btn danger-btn flex gap-2 items-center"
-                        onClick={handleDelete}
-                      >
-                        <Trash /> <span>Delete</span>
-                      </button>
-                      <a
-                        className="outline-btn flex gap-2 items-center"
-                        href={url.href.replace("download", "view")}
-                        target="_blank"
-                      >
-                        <Eye /> <span>View File</span>
-                      </a>
+
+                      {file.mimeType === "application/pdf" && (
+                        <a
+                          className="outline-btn flex gap-2 items-center"
+                          href={url.href.replace("download", "view")}
+                          target="_blank"
+                        >
+                          <Eye /> <span>View File</span>
+                        </a>
+                      )}
                     </div>
                   </div>
                 </div>
