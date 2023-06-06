@@ -12,6 +12,7 @@ import { useDropzone, DropEvent, FileRejection } from "react-dropzone";
 import { Skill, Role, Industry } from "@/app/app/resumes/upload/page";
 import { functions } from "@/libs/appwrite";
 import { Group } from "./GroupList";
+import Skeleton from "react-loading-skeleton";
 
 export type SumbitFunction = (
   title: string,
@@ -210,19 +211,23 @@ export default function ResumeForm({
           >
             Group
           </label>
-          <select
-            value={selectedGroupId}
-            id="group"
-            onChange={(e) => setSelectedGroupId(e.target.value)}
-            className="input"
-          >
-            <option value="none">None</option>
-            {groups.map((group) => (
-              <option key={group.$id} value={group.$id}>
-                {group.name}
-              </option>
-            ))}
-          </select>
+          {groups.length > 0 ? (
+            <select
+              value={selectedGroupId}
+              id="group"
+              onChange={(e) => setSelectedGroupId(e.target.value)}
+              className="input"
+            >
+              <option value="none">None</option>
+              {groups.map((group) => (
+                <option key={group.$id} value={group.$id}>
+                  {group.name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <Skeleton height={64} />
+          )}
         </div>
       </div>
       {/* METADATA */}
@@ -232,93 +237,108 @@ export default function ResumeForm({
             <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Skills
             </div>
-            <CheckBoxList
-              items={skillCheckboxes}
-              renderId={(checkbox) => checkbox.item.name + checkbox.item.$id}
-              renderLabel={(checkbox) => checkbox.item.name}
-              handleCustomValueSubmit={async (customValue) => {
-                try {
-                  const skillResponse = await functions.createExecution(
-                    process.env
-                      .NEXT_PUBLIC_FUNCTION_ID_SUBMIT_CUSTOM_SKILL as string,
-                    JSON.stringify({ name: customValue })
-                  );
-                  const skill = JSON.parse(skillResponse.response) as Skill;
-                  const skillCheckbox: Checkbox<Skill> = {
-                    key: skill.$id,
-                    item: skill,
-                    checked: false,
-                  };
-                  setSkillCheckboxes((prev) => [...prev, skillCheckbox]);
-                  return true;
-                } catch (error) {
-                  return false;
-                }
-              }}
-              setCheckboxes={setSkillCheckboxes}
-            />
+            {skillCheckboxes.length > 0 ? (
+              <CheckBoxList
+                items={skillCheckboxes}
+                renderId={(checkbox) => checkbox.item.name + checkbox.item.$id}
+                renderLabel={(checkbox) => checkbox.item.name}
+                handleCustomValueSubmit={async (customValue) => {
+                  try {
+                    const skillResponse = await functions.createExecution(
+                      process.env
+                        .NEXT_PUBLIC_FUNCTION_ID_SUBMIT_CUSTOM_SKILL as string,
+                      JSON.stringify({ name: customValue })
+                    );
+                    const skill = JSON.parse(skillResponse.response) as Skill;
+                    const skillCheckbox: Checkbox<Skill> = {
+                      key: skill.$id,
+                      item: skill,
+                      checked: false,
+                    };
+                    setSkillCheckboxes((prev) => [...prev, skillCheckbox]);
+                    return true;
+                  } catch (error) {
+                    return false;
+                  }
+                }}
+                setCheckboxes={setSkillCheckboxes}
+              />
+            ) : (
+              <Skeleton height={64} />
+            )}
           </div>
           <div className="sm:col-span-2">
             <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Industry
             </div>
-            <CheckBoxList
-              items={industryCheckboxes}
-              renderId={(checkbox) => checkbox.item.name + checkbox.item.$id}
-              renderLabel={(checkbox) => checkbox.item.name}
-              handleCustomValueSubmit={async (customValue) => {
-                try {
-                  const industryResponse = await functions.createExecution(
-                    process.env
-                      .NEXT_PUBLIC_FUNCTION_ID_SUBMIT_CUSTOM_INDUSTRY as string,
-                    JSON.stringify({ name: customValue })
-                  );
-                  const industry = JSON.parse(
-                    industryResponse.response
-                  ) as Industry;
-                  const industryCheckbox: Checkbox<Industry> = {
-                    key: industry.$id,
-                    item: industry,
-                    checked: false,
-                  };
-                  setIndustryCheckboxes((prev) => [...prev, industryCheckbox]);
-                  return true;
-                } catch (error) {
-                  return false;
-                }
-              }}
-              setCheckboxes={setIndustryCheckboxes}
-            />
+            {industryCheckboxes.length > 0 ? (
+              <CheckBoxList
+                items={industryCheckboxes}
+                renderId={(checkbox) => checkbox.item.name + checkbox.item.$id}
+                renderLabel={(checkbox) => checkbox.item.name}
+                handleCustomValueSubmit={async (customValue) => {
+                  try {
+                    const industryResponse = await functions.createExecution(
+                      process.env
+                        .NEXT_PUBLIC_FUNCTION_ID_SUBMIT_CUSTOM_INDUSTRY as string,
+                      JSON.stringify({ name: customValue })
+                    );
+                    const industry = JSON.parse(
+                      industryResponse.response
+                    ) as Industry;
+                    const industryCheckbox: Checkbox<Industry> = {
+                      key: industry.$id,
+                      item: industry,
+                      checked: false,
+                    };
+                    setIndustryCheckboxes((prev) => [
+                      ...prev,
+                      industryCheckbox,
+                    ]);
+                    return true;
+                  } catch (error) {
+                    return false;
+                  }
+                }}
+                setCheckboxes={setIndustryCheckboxes}
+              />
+            ) : (
+              <Skeleton height={64} />
+            )}
           </div>
           <div className="sm:col-span-2">
             <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Roles
             </div>
-            <CheckBoxList
-              items={roleCheckboxes}
-              renderId={(checkbox) => checkbox.item.name + checkbox.item.$id}
-              renderLabel={(checkbox) => checkbox.item.name}
-              handleCustomValueSubmit={async (customValue) => {
-                try {
-                  const roleResponse = await functions.createExecution(
-                    process.env
-                      .NEXT_PUBLIC_FUNCTION_ID_SUBMIT_CUSTOM_ROLE as string,
-                    JSON.stringify({ name: customValue })
-                  );
-                  const role = JSON.parse(roleResponse.response) as Industry;
-                  const roleCheckbox: Checkbox<Role> = {
-                    key: role.$id,
-                    item: role,
-                    checked: false,
-                  };
-                  setRoleCheckboxes((prev) => [...prev, roleCheckbox]);
-                  return true;
-                } catch (error) {
-                  return false;
-                }
-              }}
-              setCheckboxes={setRoleCheckboxes}
-            />
+            {roleCheckboxes.length > 0 ? (
+              <CheckBoxList
+                items={roleCheckboxes}
+                renderId={(checkbox) => checkbox.item.name + checkbox.item.$id}
+                renderLabel={(checkbox) => checkbox.item.name}
+                handleCustomValueSubmit={async (customValue) => {
+                  try {
+                    const roleResponse = await functions.createExecution(
+                      process.env
+                        .NEXT_PUBLIC_FUNCTION_ID_SUBMIT_CUSTOM_ROLE as string,
+                      JSON.stringify({ name: customValue })
+                    );
+                    const role = JSON.parse(roleResponse.response) as Industry;
+                    const roleCheckbox: Checkbox<Role> = {
+                      key: role.$id,
+                      item: role,
+                      checked: false,
+                    };
+                    setRoleCheckboxes((prev) => [...prev, roleCheckbox]);
+                    return true;
+                  } catch (error) {
+                    return false;
+                  }
+                }}
+                setCheckboxes={setRoleCheckboxes}
+              />
+            ) : (
+              <Skeleton height={64} />
+            )}
           </div>
         </div>
       </div>
