@@ -13,6 +13,8 @@ module.exports = {
       },
 
       colors: {
+        pdf: "#F40F02",
+        word: "#00a1f1",
         primary: {
           main: "#f9fafb",
           dark: "#ebebeb",

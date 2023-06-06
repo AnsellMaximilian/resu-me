@@ -19,6 +19,7 @@ import {
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Group } from "@/components/GroupList";
+import Image from "next/image";
 
 export default function ResumePage({
   params: { resumeId },
@@ -210,16 +211,36 @@ export default function ResumePage({
                       <div className="font-semibold text-gray-900">
                         Resume File
                       </div>
-                      <div className="text-gray-500 text-xs">{file.name}</div>
+                      <div className="text-gray-500 text-xs flex items-baseline gap-1">
+                        <div>{file.name}</div>
+                        {file.mimeType === "application/pdf" ? (
+                          <PDF className="text-pdf" />
+                        ) : (
+                          <Word className="text-word" />
+                        )}
+                      </div>
                     </div>
-                    <div className="w-72 h-64 aspect-square flex--center">
-                      <iframe
-                        src={
-                          url.href.replace("download", "view") + "#toolbar=0"
-                        }
-                        className="w-full h-full"
-                      />
-                    </div>
+                    {file.mimeType === "application/pdf" ? (
+                      <div className="w-72 h-64 aspect-square flex--center">
+                        <iframe
+                          src={
+                            url.href.replace("download", "view") + "#toolbar=0"
+                          }
+                          className="w-full h-full"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full flex-col justify-center items-center flex">
+                        <Image
+                          src="/files.svg"
+                          alt="files"
+                          height={632.17383}
+                          width={647.63626}
+                          className="max-w-full w-64"
+                        />
+                        <div className="mt-4 text-md">No Preview Available</div>
+                      </div>
+                    )}
                   </div>
                   <div className="sm:col-span-2">
                     <div className="flex gap-4 flex-wrap">
