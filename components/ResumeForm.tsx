@@ -135,6 +135,11 @@ export default function ResumeForm({
         "application/msword": [".doc"],
       },
     });
+
+  const checkBoxesFinishedLoading =
+    skillCheckboxes.length > 0 &&
+    roleCheckboxes.length > 0 &&
+    industryCheckboxes.length > 0;
   return (
     <form
       onSubmit={handleSumbit}
@@ -237,7 +242,7 @@ export default function ResumeForm({
             <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Skills
             </div>
-            {skillCheckboxes.length > 0 ? (
+            {checkBoxesFinishedLoading ? (
               <CheckBoxList
                 items={skillCheckboxes}
                 renderId={(checkbox) => checkbox.item.name + checkbox.item.$id}
@@ -271,7 +276,7 @@ export default function ResumeForm({
             <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Industry
             </div>
-            {industryCheckboxes.length > 0 ? (
+            {checkBoxesFinishedLoading ? (
               <CheckBoxList
                 items={industryCheckboxes}
                 renderId={(checkbox) => checkbox.item.name + checkbox.item.$id}
@@ -310,7 +315,7 @@ export default function ResumeForm({
             <div className="mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Roles
             </div>
-            {roleCheckboxes.length > 0 ? (
+            {checkBoxesFinishedLoading ? (
               <CheckBoxList
                 items={roleCheckboxes}
                 renderId={(checkbox) => checkbox.item.name + checkbox.item.$id}
