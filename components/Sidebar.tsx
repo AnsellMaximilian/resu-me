@@ -9,10 +9,7 @@ import React, {
   SetStateAction,
   useEffect,
 } from "react";
-import {
-  AiFillCaretDown as Down,
-  AiFillCaretRight as Right,
-} from "react-icons/ai";
+import { BiChevronRight as Right, BiChevronLeft as Left } from "react-icons/bi";
 import { FaPlus as Plus } from "react-icons/fa";
 import Spinner from "./Spinner";
 import GroupForm, { SubmitFunction } from "./GroupForm";
@@ -26,10 +23,14 @@ export default function Sidebar({
   setGroups,
   setResumeGroupFilter,
   resumeGroupFilter,
+  isSidebarOpen,
+  setIsSidebarOpen,
 }: {
   groups: Group[];
   setGroups: Dispatch<SetStateAction<Group[]>>;
   setResumeGroupFilter: Dispatch<SetStateAction<string | null>>;
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
   resumeGroupFilter: string | null;
 }) {
   const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
@@ -113,24 +114,32 @@ export default function Sidebar({
   }, [isCreateGroupDialogOpen]);
 
   return (
-    <div className="w-sidebar-w-open sidebar bg-white fixed left-0 border-r border-gray-200 p-4">
-      <div className="mb-4 flex--between">
-        <div className="text-md font-semibold">Groups</div>
-        <button
-          className="outline-btn py-1"
-          onClick={() => setIsCreateGroupDialogOpen(true)}
-        >
-          <Plus />
-        </button>
-      </div>
+    <div
+      className={`${
+        isSidebarOpen ? "w-sidebar-w-open" : "w-8"
+      } sidebar bg-white fixed left-0 border-r border-gray-200 p-4 transition-all duration-100`}
+    >
+      {isSidebarOpen && (
+        <>
+          <div className="mb-4 flex--between">
+            <div className="text-md font-semibold">Groups</div>
+            <button
+              className="outline-btn py-1"
+              onClick={() => setIsCreateGroupDialogOpen(true)}
+            >
+              <Plus />
+            </button>
+          </div>
 
-      <GroupList
-        groups={groups}
-        setResumeGroupFilter={setResumeGroupFilter}
-        setGroups={setGroups}
-        resumeGroupFilter={resumeGroupFilter}
-        setGroupToEdit={setGroupToEdit}
-      />
+          <GroupList
+            groups={groups}
+            setResumeGroupFilter={setResumeGroupFilter}
+            setGroups={setGroups}
+            resumeGroupFilter={resumeGroupFilter}
+            setGroupToEdit={setGroupToEdit}
+          />
+        </>
+      )}
       <Dialog
         onClose={() => {
           setIsCreateGroupDialogOpen(false);
@@ -145,6 +154,12 @@ export default function Sidebar({
           resumeGroupFilter={resumeGroupFilter}
         />
       </Dialog>
+      <button
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className="shadow w-8 h-8 rounded-full border border-gray-200 absolute bottom-16 -right-4 bg-white items-center flex justify-center hover:bg-primary-dark"
+      >
+        {isSidebarOpen ? <Left size={20} /> : <Right size={20} />}
+      </button>
     </div>
   );
 }

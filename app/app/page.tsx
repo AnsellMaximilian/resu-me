@@ -35,6 +35,7 @@ export default function AppPage() {
   const [resumeGroupFilter, setResumeGroupFilter] = useState<string | null>(
     null
   );
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // const organizedGroups = useMemo(() => organizeGroups(groups), [groups]);
 
@@ -191,12 +192,18 @@ export default function AppPage() {
   return (
     <div className="bg-primary-main overflow-hidden h-full">
       <Sidebar
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
         groups={groups}
         setGroups={setGroups}
         setResumeGroupFilter={setResumeGroupFilter}
         resumeGroupFilter={resumeGroupFilter}
       />
-      <div className="ml-sidebar-w-open h-full">
+      <div
+        className={`${
+          isSidebarOpen ? "ml-sidebar-w-open" : "ml-8"
+        } h-full transition-all duration-75`}
+      >
         <div className="p-4 h-full">
           <div className="mb-4">
             <ResumeFilter
