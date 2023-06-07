@@ -86,7 +86,7 @@ export default function ResumeFilter({
 
   return (
     <form
-      className="flex gap-4 items-center flex-wrap md:flex-nowrap"
+      className="flex gap-4 items-center flex-wrap sm:flex-nowrap"
       onSubmit={handleSubmit}
     >
       <input
@@ -98,11 +98,11 @@ export default function ResumeFilter({
         className="input rounded-full py-2"
         placeholder="Search for resume title"
       />
-      <Popover className="relative">
+      <Popover className="relative w-full sm:w-auto">
         <Popover.Button
           className={`${
             skillsFilterCount > 0 ? "filter-input--active" : "filter-input"
-          } flex gap-2 items-center`}
+          } flex gap-2 items-center w-full sm:w-auto justify-between`}
         >
           <span>Skills</span>
           {skillsFilterCount > 0 && (
@@ -140,11 +140,11 @@ export default function ResumeFilter({
         </Popover.Panel>
       </Popover>
 
-      <Popover className="relative">
+      <Popover className="relative w-full sm:w-auto">
         <Popover.Button
           className={`${
             rolesFilterCount > 0 ? "filter-input--active" : "filter-input"
-          } flex gap-2 items-center`}
+          } flex gap-2 items-center w-full sm:w-auto justify-between`}
         >
           <span>Roles</span>
           {rolesFilterCount > 0 && (
@@ -182,11 +182,11 @@ export default function ResumeFilter({
         </Popover.Panel>
       </Popover>
 
-      <Popover className="relative">
+      <Popover className="relative w-full sm:w-auto">
         <Popover.Button
           className={`${
             industriesFilterCount > 0 ? "filter-input--active" : "filter-input"
-          } flex gap-2 items-center`}
+          } flex gap-2 items-center w-full sm:w-auto justify-between`}
         >
           <span>Industries</span>
           {industriesFilterCount > 0 && (
@@ -225,7 +225,7 @@ export default function ResumeFilter({
           />
         </Popover.Panel>
       </Popover>
-      <button className="primary-btn">Filter</button>
+      <button className="primary-btn w-full sm:w-auto">Filter</button>
     </form>
   );
 }
