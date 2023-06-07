@@ -73,6 +73,11 @@
     height: calc(100vh - theme("spacing.appheader-h"));
   }
 
+  .app-header {
+    height: theme("spacing.appheader-h");
+    min-height: theme("spacing.appheader-h");
+  }
+
   .sidebar {
     @apply with-app-height;
   }

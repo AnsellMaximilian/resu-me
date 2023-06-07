@@ -157,7 +157,7 @@ export default function UploadResumePage() {
     }
   };
   return (
-    <div className="p-4">
+    <div className="p-4 flex flex-col">
       <div className="mb-4">
         <Link href="/app" className="flex gap-1 items-center hover:underline">
           <Left />

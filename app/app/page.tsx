@@ -190,7 +190,7 @@ export default function AppPage() {
   };
 
   return (
-    <div className="bg-primary-main flex flex-col">
+    <div className="bg-primary-main flex flex-col relative grow overflow-y-hidden">
       <Sidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
@@ -202,9 +202,9 @@ export default function AppPage() {
       <div
         className={`${
           isSidebarOpen ? "md:ml-sidebar-w-open ml-8" : "ml-8"
-        } flex flex-col transition-all duration-75`}
+        } flex flex-col transition-all duration-75 overflow-y-auto`}
       >
-        <div className="p-4 h-full">
+        <div className="p-4">
           <div className="mb-4">
             <ResumeFilter
               skills={approvedSkills}

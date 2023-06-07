@@ -19,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-primary-main`}>
+      <body className={`${inter.className} bg-primary-main overflow-hidden`}>
         {children}
         <ToastContainer />
       </body>

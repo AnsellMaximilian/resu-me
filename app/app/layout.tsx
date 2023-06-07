@@ -6,7 +6,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="h-screen flex flex-col overflow-y-hidden">
       <AppHeader />
-      <div className="flex flex-col overflow-y-auto">{children}</div>
+      <div className="flex flex-col overflow-y-auto grow">{children}</div>
     </div>
   );
 }
