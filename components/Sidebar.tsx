@@ -117,7 +117,7 @@ export default function Sidebar({
     <div
       className={`${
         isSidebarOpen ? "w-sidebar-w-open" : "w-8"
-      } sidebar bg-white fixed left-0 border-r border-gray-200 p-4 transition-all duration-100`}
+      } sidebar bg-white fixed left-0 border-r border-gray-200 p-4 transition-all duration-100 z-50`}
     >
       {isSidebarOpen && (
         <>

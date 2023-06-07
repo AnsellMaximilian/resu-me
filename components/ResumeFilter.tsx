@@ -85,7 +85,10 @@ export default function ResumeFilter({
   };
 
   return (
-    <form className="flex gap-4 items-center" onSubmit={handleSubmit}>
+    <form
+      className="flex gap-4 items-center flex-wrap md:flex-nowrap"
+      onSubmit={handleSubmit}
+    >
       <input
         value={titleSearch}
         onChange={(e) => setTitleSearch(e.target.value)}

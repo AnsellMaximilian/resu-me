@@ -26,7 +26,7 @@ export default function ResumeCard({
     resume.$id
   );
   return (
-    <div className="bg-white shadow-md rounded-md border-gray-300 border flex gap-4 items-center justify-start p-4 w-64 h-24 relative">
+    <div className="bg-white shadow-md rounded-md border-gray-300 border flex gap-4 items-center justify-start p-4 w-full sm:w-64 h-24 relative">
       <Menu as="div" className="absolute top-0 right-0 text-right">
         <Menu.Button className="p-1">
           <RiMoreLine />

@@ -201,7 +201,7 @@ export default function AppPage() {
       />
       <div
         className={`${
-          isSidebarOpen ? "ml-sidebar-w-open" : "ml-8"
+          isSidebarOpen ? "md:ml-sidebar-w-open ml-8" : "ml-8"
         } h-full transition-all duration-75`}
       >
         <div className="p-4 h-full">

@@ -29,7 +29,11 @@ export default function UserMenu({
               height={adminPage ? 40 : 32}
               className="rounded-full bg-white"
             />
-            <div className="flex flex-col items-start">
+            <div
+              className={`${
+                adminPage ? "" : "hidden sm:block"
+              } flex flex-col items-start`}
+            >
               <div>{currentAccount.name}</div>
               {currentAccount.isAdmin && adminPage && (
                 <div className="text-xs text-gray-100">Admin</div>
