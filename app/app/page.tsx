@@ -190,7 +190,7 @@ export default function AppPage() {
   };
 
   return (
-    <div className="bg-primary-main overflow-hidden h-full">
+    <div className="bg-primary-main flex flex-col">
       <Sidebar
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
@@ -202,7 +202,7 @@ export default function AppPage() {
       <div
         className={`${
           isSidebarOpen ? "md:ml-sidebar-w-open ml-8" : "ml-8"
-        } h-full transition-all duration-75`}
+        } flex flex-col transition-all duration-75`}
       >
         <div className="p-4 h-full">
           <div className="mb-4">

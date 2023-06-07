@@ -69,8 +69,12 @@
     @apply rounded-full bg-white text-gray-600 h-4 min-w-[16px] text-xs flex items-center justify-center;
   }
 
-  .sidebar {
+  .with-app-height {
     height: calc(100vh - theme("spacing.appheader-h"));
+  }
+
+  .sidebar {
+    @apply with-app-height;
   }
 
   .flex--center {
