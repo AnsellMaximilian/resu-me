@@ -115,8 +115,13 @@ export default function Sidebar({
 
   return (
     <div
+      onClick={() => {
+        if (!isSidebarOpen) setIsSidebarOpen(true);
+      }}
       className={`${
-        isSidebarOpen ? "w-sidebar-w-open" : "w-8"
+        isSidebarOpen
+          ? "w-sidebar-w-open"
+          : "w-8 hover:bg-primary-dark sm:hover:bg-white cursor-pointer"
       } sidebar bg-white fixed left-0 border-r border-gray-200 p-4 transition-all duration-100 z-50`}
     >
       {isSidebarOpen && (
