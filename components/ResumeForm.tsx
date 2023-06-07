@@ -348,7 +348,7 @@ export default function ResumeForm({
         </div>
       </div>
 
-      <div className="col-span-12">
+      <div className="col-span-12 text-right">
         <button
           type="submit"
           disabled={submitting}

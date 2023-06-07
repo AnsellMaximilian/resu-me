@@ -17,6 +17,11 @@ import React, {
 import { useDropzone, DropEvent, FileRejection } from "react-dropzone";
 import { ToastContainer, toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
+import {
+  AiFillCaretLeft as Left,
+  AiFillCaretRight as Right,
+} from "react-icons/ai";
+import Link from "next/link";
 
 export interface Skill extends Models.Document {
   name: string;
@@ -153,7 +158,13 @@ export default function UploadResumePage() {
   };
   return (
     <div className="p-4">
-      <section className="bg-white">
+      <div className="mb-4">
+        <Link href="/app" className="flex gap-1 items-center hover:underline">
+          <Left />
+          <span>Go back</span>
+        </Link>
+      </div>
+      <section className="bg-white p-4 rounded-md shadow">
         {/* <div className="py-8 px-4 mx-auto max-w-2xl lg:py-16"> */}
         <div className="">
           <h2 className="mb-4 text-xl font-bold text-gray-900">

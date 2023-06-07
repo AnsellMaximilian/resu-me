@@ -11,6 +11,7 @@ import Spinner from "@/components/Spinner";
 import useAuth from "@/hooks/useAuth";
 import { account, databases, functions, storage } from "@/libs/appwrite";
 import { ID, Models, Query } from "appwrite";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, {
   useCallback,
@@ -21,6 +22,10 @@ import React, {
 } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
+import {
+  AiFillCaretLeft as Left,
+  AiFillCaretRight as Right,
+} from "react-icons/ai";
 
 export interface Skill extends Models.Document {
   name: string;
@@ -203,7 +208,13 @@ export default function EditResumePage({
 
   return (
     <div className="p-4">
-      <section className="bg-white">
+      <div className="mb-4">
+        <Link href="/app" className="flex gap-1 items-center hover:underline">
+          <Left />
+          <span>Go back</span>
+        </Link>
+      </div>
+      <section className="bg-white p-4 rounded-sm shadow">
         {/* <div className="py-8 px-4 mx-auto max-w-2xl lg:py-16"> */}
         <div className="">
           <h2 className="mb-4 text-xl font-bold text-gray-900">
