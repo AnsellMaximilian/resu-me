@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useMemo } from "react";
+import React, { Dispatch, SetStateAction, useContext, useMemo } from "react";
 import { Resume } from "./ResumeList";
 import {
   FaFilePdf as PDF,
@@ -21,6 +21,7 @@ import {
 } from "react-icons/ai";
 import useAuth from "@/hooks/useAuth";
 import { updateFavorites } from "@/services/favorites";
+import { AuthContext } from "@/contexts/authContext";
 
 export default function ResumeCard({
   resume,
@@ -34,7 +35,7 @@ export default function ResumeCard({
   setFavoriteIds: Dispatch<SetStateAction<string[]>>;
   favoriteIds: string[];
 }) {
-  const { currentAccount } = useAuth();
+  const { currentAccount } = useContext(AuthContext);
 
   const url = storage.getFileDownload(
     process.env.NEXT_PUBLIC_BUCKET_ID as string,

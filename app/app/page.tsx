@@ -21,6 +21,7 @@ import useAuth from "@/hooks/useAuth";
 import { Models } from "appwrite";
 import { FAVORITE_GROUP } from "@/constants/general";
 import { Favorite, getFavorites } from "@/services/favorites";
+import { AuthContext } from "@/contexts/authContext";
 
 export default function AppPage() {
   const { currentAccount } = useAuth();
@@ -63,7 +64,8 @@ export default function AppPage() {
 
           return (
             (resumeGroupFilter === null ||
-              favoriteIds.includes(res.$id) ||
+              (resumeGroupFilter === FAVORITE_GROUP &&
+                favoriteIds.includes(res.$id)) ||
               (res.groupId && viableGroupIds.includes(resumeGroupFilter))) &&
             res.title.toLowerCase().includes(titleFilter.toLowerCase()) &&
             (selectedSkillIds.length === 0 ||
@@ -209,46 +211,48 @@ export default function AppPage() {
   };
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className="bg-primary-main flex flex-col relative grow overflow-y-hidden">
-        <Sidebar
-          setResumes={setResumes}
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
-          groups={groups}
-          setGroups={setGroups}
-          setResumeGroupFilter={setResumeGroupFilter}
-          resumeGroupFilter={resumeGroupFilter}
-        />
-        <div
-          className={`${
-            isSidebarOpen ? "md:ml-sidebar-w-open ml-8" : "ml-8"
-          } flex flex-col transition-all duration-75 overflow-y-auto grow`}
-        >
-          <div className="p-4 grow">
-            <div className="mb-4">
-              <ResumeFilter
-                skills={approvedSkills}
-                industries={approvedIndustries}
-                roles={approvedRoles}
-                onFilter={handleFilter}
-              />
+    <AuthContext.Provider value={{ currentAccount }}>
+      <DndProvider backend={HTML5Backend}>
+        <div className="bg-primary-main flex flex-col relative grow overflow-y-hidden">
+          <Sidebar
+            setResumes={setResumes}
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+            groups={groups}
+            setGroups={setGroups}
+            setResumeGroupFilter={setResumeGroupFilter}
+            resumeGroupFilter={resumeGroupFilter}
+          />
+          <div
+            className={`${
+              isSidebarOpen ? "md:ml-sidebar-w-open ml-8" : "ml-8"
+            } flex flex-col transition-all duration-75 overflow-y-auto grow`}
+          >
+            <div className="p-4 grow">
+              <div className="mb-4">
+                <ResumeFilter
+                  skills={approvedSkills}
+                  industries={approvedIndustries}
+                  roles={approvedRoles}
+                  onFilter={handleFilter}
+                />
+              </div>
+              {!isResumeTransitionPending ? (
+                <ResumeList
+                  favoriteIds={favoriteIds}
+                  setFavoriteIds={setFavoriteIds}
+                  resumes={filteredResumes}
+                  handleDelete={handleDelete}
+                  isLoading={isLoading}
+                />
+              ) : (
+                <Skeleton count={1} height={72} />
+              )}
+              <ToastContainer />
             </div>
-            {!isResumeTransitionPending ? (
-              <ResumeList
-                favoriteIds={favoriteIds}
-                setFavoriteIds={setFavoriteIds}
-                resumes={filteredResumes}
-                handleDelete={handleDelete}
-                isLoading={isLoading}
-              />
-            ) : (
-              <Skeleton count={1} height={72} />
-            )}
-            <ToastContainer />
           </div>
         </div>
-      </div>
-    </DndProvider>
+      </DndProvider>
+    </AuthContext.Provider>
   );
 }
