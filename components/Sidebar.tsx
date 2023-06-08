@@ -18,6 +18,8 @@ import { databases } from "@/libs/appwrite";
 import GroupList, { Group } from "./GroupList";
 import Dialog from "./Dialog";
 import { Resume } from "./ResumeList";
+import { AiFillStar as Star } from "react-icons/ai";
+import { FAVORITE_GROUP } from "@/constants/general";
 
 export default function Sidebar({
   groups,
@@ -128,26 +130,45 @@ export default function Sidebar({
       } sidebar bg-white fixed left-0 border-r border-gray-200 p-4 transition-all duration-100 z-50`}
     >
       {isSidebarOpen && (
-        <>
-          <div className="mb-4 flex--between">
-            <div className="text-md font-semibold">Groups</div>
-            <button
-              className="outline-btn py-1"
-              onClick={() => setIsCreateGroupDialogOpen(true)}
-            >
-              <Plus />
-            </button>
-          </div>
+        <div className="h-full overflow-y-auto flex flex-col">
+          <div>
+            <div className="mb-4 flex--between">
+              <div className="text-md font-semibold">Groups</div>
+              <button
+                className="outline-btn py-1"
+                onClick={() => setIsCreateGroupDialogOpen(true)}
+              >
+                <Plus />
+              </button>
+            </div>
 
-          <GroupList
-            setResumes={setResumes}
-            groups={groups}
-            setResumeGroupFilter={setResumeGroupFilter}
-            setGroups={setGroups}
-            resumeGroupFilter={resumeGroupFilter}
-            setGroupToEdit={setGroupToEdit}
-          />
-        </>
+            <GroupList
+              setResumes={setResumes}
+              groups={groups}
+              setResumeGroupFilter={setResumeGroupFilter}
+              setGroups={setGroups}
+              resumeGroupFilter={resumeGroupFilter}
+              setGroupToEdit={setGroupToEdit}
+            />
+          </div>
+          <div className="mt-auto">
+            <div
+              onClick={() => setResumeGroupFilter(FAVORITE_GROUP)}
+              className={`bg-primary-main group flex items-center justify-between px-2 py-1 hover:bg-primary-dark rounded-full cursor-pointer ${
+                resumeGroupFilter === FAVORITE_GROUP
+                  ? "bg-secondary-lighter hover:bg-secondary-light"
+                  : ""
+              }`}
+            >
+              <div className="flex items-center gap-2 w-full text-ellipsis overflow-hidden whitespace-nowrap">
+                <Star className="text-yellow-500" />
+                <span className="block w-full text-ellipsis overflow-hidden whitespace-nowrap">
+                  Favorites
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
       <Dialog
         onClose={() => {

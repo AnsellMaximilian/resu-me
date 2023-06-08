@@ -39,7 +39,11 @@ module.exports = async function (req, res) {
       req.variables["DATABASE_ID"],
       req.variables["FAVORITE_COLLECTION_ID"],
       userData.$id,
-      { resumes: [] }
+      { resumes: [] },
+      [
+        sdk.Permission.read(sdk.Role.user(userData.$id)),
+        sdk.Permission.update(sdk.Role.user(userData.$id)),
+      ]
     );
 
     res.json(userFavorites);

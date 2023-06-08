@@ -1,7 +1,6 @@
 "use client";
 
 import client, { account, databases, storage } from "@/libs/appwrite";
-import { Account, Models } from "appwrite";
 
 import AppHeader from "@/components/AppHeader";
 import { useEffect, useState, useMemo, useTransition } from "react";
@@ -15,17 +14,18 @@ import Sidebar from "@/components/Sidebar";
 import { Group } from "@/components/GroupList";
 import { getAllGroupIds, getGroupParents, organizeGroups } from "@/helpers";
 import Skeleton from "react-loading-skeleton";
-import {
-  ALL_GROUP_DROP_ID,
-  GROUP_DROP_ID_PREFIX,
-} from "@/constants/dragAndDrop";
 import { updateResume } from "@/services/resumes";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import useAuth from "@/hooks/useAuth";
+import { Models } from "appwrite";
+import { FAVORITE_GROUP } from "@/constants/general";
+import { Favorite, getFavorites } from "@/services/favorites";
 
 export default function AppPage() {
-  const [isResumeTransitionPending, startResumeTransition] = useTransition();
+  const { currentAccount } = useAuth();
 
+  const [isResumeTransitionPending, startResumeTransition] = useTransition();
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [industries, setIndustries] = useState<Industry[]>([]);
@@ -43,8 +43,7 @@ export default function AppPage() {
     null
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-
-  // const organizedGroups = useMemo(() => organizeGroups(groups), [groups]);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
 
   useEffect(() => {
     startResumeTransition(() => {
@@ -64,6 +63,7 @@ export default function AppPage() {
 
           return (
             (resumeGroupFilter === null ||
+              favoriteIds.includes(res.$id) ||
               (res.groupId && viableGroupIds.includes(resumeGroupFilter))) &&
             res.title.toLowerCase().includes(titleFilter.toLowerCase()) &&
             (selectedSkillIds.length === 0 ||
@@ -77,6 +77,7 @@ export default function AppPage() {
       );
     });
   }, [
+    favoriteIds,
     groups,
     resumeGroupFilter,
     selectedIndustryIds,
@@ -152,6 +153,17 @@ export default function AppPage() {
     })();
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        if (currentAccount && resumes.length > 0) {
+          const favorite = await getFavorites(currentAccount.$id);
+          setFavoriteIds(favorite.resumes);
+        }
+      } catch (error) {}
+    })();
+  }, [currentAccount, resumes]);
+
   const handleDelete = async (resumeId: string) => {
     try {
       await databases.deleteDocument(
@@ -224,6 +236,8 @@ export default function AppPage() {
             </div>
             {!isResumeTransitionPending ? (
               <ResumeList
+                favoriteIds={favoriteIds}
+                setFavoriteIds={setFavoriteIds}
                 resumes={filteredResumes}
                 handleDelete={handleDelete}
                 isLoading={isLoading}

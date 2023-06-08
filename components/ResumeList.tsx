@@ -3,7 +3,7 @@ import { databases, storage } from "@/libs/appwrite";
 import { Models } from "appwrite";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import {
   FaPlus as Plus,
   FaFilePdf as PDF,
@@ -30,10 +30,14 @@ export default function ResumeList({
   resumes,
   handleDelete,
   isLoading,
+  setFavoriteIds,
+  favoriteIds,
 }: {
   resumes: Resume[];
   handleDelete: (resumeId: string) => Promise<boolean>;
   isLoading: boolean;
+  setFavoriteIds: Dispatch<SetStateAction<string[]>>;
+  favoriteIds: string[];
 }) {
   return (
     <section>
@@ -51,6 +55,8 @@ export default function ResumeList({
           <ul className="flex gap-4 flex-wrap">
             {resumes.map((resume, index) => (
               <ResumeCard
+                favoriteIds={favoriteIds}
+                setFavoriteIds={setFavoriteIds}
                 draggableIndex={index}
                 key={resume.$id}
                 resume={resume}
