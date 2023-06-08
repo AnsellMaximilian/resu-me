@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 import { databases } from "@/libs/appwrite";
 import GroupList, { Group } from "./GroupList";
 import Dialog from "./Dialog";
+import { Droppable } from "react-beautiful-dnd";
 
 export default function Sidebar({
   groups,

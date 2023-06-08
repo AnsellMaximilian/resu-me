@@ -2,6 +2,7 @@
 
 import client, { account, databases, storage } from "@/libs/appwrite";
 import { Account, Models } from "appwrite";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
 import AppHeader from "@/components/AppHeader";
 import { useEffect, useState, useMemo, useTransition } from "react";
@@ -15,6 +16,11 @@ import Sidebar from "@/components/Sidebar";
 import { Group } from "@/components/GroupList";
 import { getAllGroupIds, getGroupParents, organizeGroups } from "@/helpers";
 import Skeleton from "react-loading-skeleton";
+import {
+  ALL_GROUP_DROP_ID,
+  GROUP_DROP_ID_PREFIX,
+} from "@/constants/dragAndDrop";
+import { updateResume } from "@/services/resumes";
 
 export default function AppPage() {
   const [isResumeTransitionPending, startResumeTransition] = useTransition();
@@ -190,41 +196,63 @@ export default function AppPage() {
   };
 
   return (
-    <div className="bg-primary-main flex flex-col relative grow overflow-y-hidden">
-      <Sidebar
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-        groups={groups}
-        setGroups={setGroups}
-        setResumeGroupFilter={setResumeGroupFilter}
-        resumeGroupFilter={resumeGroupFilter}
-      />
-      <div
-        className={`${
-          isSidebarOpen ? "md:ml-sidebar-w-open ml-8" : "ml-8"
-        } flex flex-col transition-all duration-75 overflow-y-auto`}
-      >
-        <div className="p-4">
-          <div className="mb-4">
-            <ResumeFilter
-              skills={approvedSkills}
-              industries={approvedIndustries}
-              roles={approvedRoles}
-              onFilter={handleFilter}
-            />
+    <DragDropContext
+      onDragEnd={async (result) => {
+        if (!result.destination) return;
+        const { source, destination, draggableId } = result;
+        if (destination.droppableId === ALL_GROUP_DROP_ID) {
+          console.log("all group");
+        } else if (destination.droppableId.startsWith(GROUP_DROP_ID_PREFIX)) {
+          const [_, groupId] = destination.droppableId.split("-");
+          console.log("Group ID", groupId);
+          const resume = await updateResume(draggableId, { groupId });
+          setResumes((prev) =>
+            prev.map((res) =>
+              res.$id === draggableId
+                ? { ...res, groupId: resume.groupId }
+                : res
+            )
+          );
+        }
+        // console.log(result);
+      }}
+    >
+      <div className="bg-primary-main flex flex-col relative grow overflow-y-hidden">
+        <Sidebar
+          isSidebarOpen={isSidebarOpen}
+          setIsSidebarOpen={setIsSidebarOpen}
+          groups={groups}
+          setGroups={setGroups}
+          setResumeGroupFilter={setResumeGroupFilter}
+          resumeGroupFilter={resumeGroupFilter}
+        />
+        <div
+          className={`${
+            isSidebarOpen ? "md:ml-sidebar-w-open ml-8" : "ml-8"
+          } flex flex-col transition-all duration-75 overflow-y-auto grow`}
+        >
+          <div className="p-4 grow">
+            <div className="mb-4">
+              <ResumeFilter
+                skills={approvedSkills}
+                industries={approvedIndustries}
+                roles={approvedRoles}
+                onFilter={handleFilter}
+              />
+            </div>
+            {!isResumeTransitionPending ? (
+              <ResumeList
+                resumes={filteredResumes}
+                handleDelete={handleDelete}
+                isLoading={isLoading}
+              />
+            ) : (
+              <Skeleton count={1} height={72} />
+            )}
+            <ToastContainer />
           </div>
-          {!isResumeTransitionPending ? (
-            <ResumeList
-              resumes={filteredResumes}
-              handleDelete={handleDelete}
-              isLoading={isLoading}
-            />
-          ) : (
-            <Skeleton count={1} height={72} />
-          )}
-          <ToastContainer />
         </div>
       </div>
-    </div>
+    </DragDropContext>
   );
 }
