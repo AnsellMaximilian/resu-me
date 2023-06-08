@@ -76,6 +76,21 @@
             "events": [],
             "schedule": "",
             "timeout": 15
+        },
+        {
+            "$id": "64816fda3abcc24dd6c3",
+            "name": "createFavorites",
+            "runtime": "node-16.0",
+            "path": "functions/createFavorites",
+            "entrypoint": "src/index.js",
+            "ignore": [
+                "node_modules",
+                ".npm"
+            ],
+            "execute": [],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
         }
     ]
 }
