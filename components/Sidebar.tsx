@@ -17,7 +17,7 @@ import { toast } from "react-toastify";
 import { databases } from "@/libs/appwrite";
 import GroupList, { Group } from "./GroupList";
 import Dialog from "./Dialog";
-import { Droppable } from "react-beautiful-dnd";
+import { Resume } from "./ResumeList";
 
 export default function Sidebar({
   groups,
@@ -26,6 +26,7 @@ export default function Sidebar({
   resumeGroupFilter,
   isSidebarOpen,
   setIsSidebarOpen,
+  setResumes,
 }: {
   groups: Group[];
   setGroups: Dispatch<SetStateAction<Group[]>>;
@@ -33,6 +34,7 @@ export default function Sidebar({
   isSidebarOpen: boolean;
   setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
   resumeGroupFilter: string | null;
+  setResumes: Dispatch<SetStateAction<Resume[]>>;
 }) {
   const [isCreateGroupDialogOpen, setIsCreateGroupDialogOpen] = useState(false);
   const [groupToEdit, setGroupToEdit] = useState<Group | null>(null);
@@ -138,6 +140,7 @@ export default function Sidebar({
           </div>
 
           <GroupList
+            setResumes={setResumes}
             groups={groups}
             setResumeGroupFilter={setResumeGroupFilter}
             setGroups={setGroups}

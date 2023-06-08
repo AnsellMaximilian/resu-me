@@ -2,7 +2,6 @@
 
 import client, { account, databases, storage } from "@/libs/appwrite";
 import { Account, Models } from "appwrite";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
 import AppHeader from "@/components/AppHeader";
 import { useEffect, useState, useMemo, useTransition } from "react";
@@ -21,6 +20,8 @@ import {
   GROUP_DROP_ID_PREFIX,
 } from "@/constants/dragAndDrop";
 import { updateResume } from "@/services/resumes";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 export default function AppPage() {
   const [isResumeTransitionPending, startResumeTransition] = useTransition();
@@ -196,29 +197,10 @@ export default function AppPage() {
   };
 
   return (
-    <DragDropContext
-      onDragEnd={async (result) => {
-        if (!result.destination) return;
-        const { source, destination, draggableId } = result;
-        if (destination.droppableId === ALL_GROUP_DROP_ID) {
-          console.log("all group");
-        } else if (destination.droppableId.startsWith(GROUP_DROP_ID_PREFIX)) {
-          const [_, groupId] = destination.droppableId.split("-");
-          console.log("Group ID", groupId);
-          const resume = await updateResume(draggableId, { groupId });
-          setResumes((prev) =>
-            prev.map((res) =>
-              res.$id === draggableId
-                ? { ...res, groupId: resume.groupId }
-                : res
-            )
-          );
-        }
-        // console.log(result);
-      }}
-    >
+    <DndProvider backend={HTML5Backend}>
       <div className="bg-primary-main flex flex-col relative grow overflow-y-hidden">
         <Sidebar
+          setResumes={setResumes}
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
           groups={groups}
@@ -253,6 +235,6 @@ export default function AppPage() {
           </div>
         </div>
       </div>
-    </DragDropContext>
+    </DndProvider>
   );
 }

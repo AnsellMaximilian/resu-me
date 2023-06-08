@@ -21,12 +21,11 @@ import {
 import { RiMoreLine as More } from "react-icons/ri";
 import { getAllGroupIds, organizeGroups } from "@/helpers";
 import { functions } from "@/libs/appwrite";
-import { Droppable } from "react-beautiful-dnd";
-import {
-  ALL_GROUP_DROP_ID,
-  GROUP_DROP_ID_PREFIX,
-} from "@/constants/dragAndDrop";
 import { Group, OrganizedGroup } from "./GroupList";
+import { useDrop } from "react-dnd";
+import { dropItemTypes } from "@/constants/dragAndDrop";
+import { Resume } from "./ResumeList";
+import { updateResume } from "@/services/resumes";
 
 export default function Group({
   group,
@@ -34,6 +33,7 @@ export default function Group({
   setResumeGroupFilter,
   resumeGroupFilter,
   setGroupToEdit,
+  setResumes,
 }: {
   group: OrganizedGroup;
   setResumeGroupFilter: Dispatch<SetStateAction<string | null>>;
@@ -41,8 +41,30 @@ export default function Group({
 
   resumeGroupFilter: string | null;
   setGroups: Dispatch<SetStateAction<Group[]>>;
+  setResumes: Dispatch<SetStateAction<Resume[]>>;
 }) {
   const [subgroupOpen, setSubgroupOpen] = useState(false);
+  const [{ isOver }, drop] = useDrop(
+    () => ({
+      accept: dropItemTypes.RESUME,
+      drop: async (item, monitor) => {
+        const groupId = group.group.$id;
+        const draggedResume = monitor.getItem() as Resume;
+        const resume = await updateResume(draggedResume.$id, { groupId: null });
+
+        setResumeGroupFilter(groupId);
+        setResumes((prev) =>
+          prev.map((res) =>
+            res.$id === resume.$id ? { ...res, groupId } : res
+          )
+        );
+      },
+      collect: (monitor) => ({
+        isOver: !!monitor.isOver(),
+      }),
+    }),
+    []
+  );
   const handleDelete = async (group: OrganizedGroup) => {
     const ids = getAllGroupIds(group);
     const res = await functions.createExecution(
@@ -71,73 +93,68 @@ export default function Group({
       }}
       className=""
     >
-      <Droppable droppableId={`${GROUP_DROP_ID_PREFIX}-${group.group.$id}`}>
-        {(provided) => {
-          return (
-            <div ref={provided.innerRef} {...provided.droppableProps}>
-              <div
-                className={`group flex items-center justify-between px-2 py-1 bg-primary-main hover:bg-primary-dark rounded-full cursor-pointer ${
-                  resumeGroupFilter === group.group.$id
-                    ? "bg-secondary-lighter hover:bg-secondary-light"
-                    : ""
-                }`}
+      <div
+        ref={drop}
+        className={`${
+          isOver ? "bg-primary-dark" : "bg-primary-main"
+        } group flex items-center justify-between px-2 py-1 hover:bg-primary-dark rounded-full cursor-pointer ${
+          resumeGroupFilter === group.group.$id
+            ? "bg-secondary-lighter hover:bg-secondary-light"
+            : ""
+        }`}
+      >
+        <div className="flex items-center gap-2 w-full text-ellipsis overflow-hidden whitespace-nowrap">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setSubgroupOpen(!subgroupOpen);
+            }}
+          >
+            {subgroupOpen ? <Down size={12} /> : <Right size={12} />}
+          </button>
+          <span className="block w-full text-ellipsis overflow-hidden whitespace-nowrap">
+            {group.group.name}
+          </span>
+        </div>
+        <Menu as="div" className="relative hidden group-hover:block ">
+          <Menu.Button
+            className="block hover:text-gray-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <More />
+          </Menu.Button>
+          <Menu.Items className="absolute text-sm z-50 right-0 shadow-lg origin-top-right bg-white mt-1 w-32 ring-1 ring-gray-200 rounded-lg overflow-hidden">
+            <Menu.Item>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(group);
+                }}
+                className="flex gap-2 items-center px-3 py-2 hover:text-black transition-all duration-100 w-full text-left hover:bg-primary-main"
               >
-                <div className="flex items-center gap-2 w-full text-ellipsis overflow-hidden whitespace-nowrap">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSubgroupOpen(!subgroupOpen);
-                    }}
-                  >
-                    {subgroupOpen ? <Down size={12} /> : <Right size={12} />}
-                  </button>
-                  <span className="block w-full text-ellipsis overflow-hidden whitespace-nowrap">
-                    {group.group.name}
-                  </span>
-                </div>
-                <Menu as="div" className="relative hidden group-hover:block ">
-                  <Menu.Button
-                    className="block hover:text-gray-300"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <More />
-                  </Menu.Button>
-                  <Menu.Items className="absolute text-sm z-50 right-0 shadow-lg origin-top-right bg-white mt-1 w-32 ring-1 ring-gray-200 rounded-lg overflow-hidden">
-                    <Menu.Item>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDelete(group);
-                        }}
-                        className="flex gap-2 items-center px-3 py-2 hover:text-black transition-all duration-100 w-full text-left hover:bg-primary-main"
-                      >
-                        <Trash size={10} className="text-gray-600" /> Delete
-                      </button>
-                    </Menu.Item>
-                    <Menu.Item>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setGroupToEdit(group.group);
-                        }}
-                        className="flex gap-2 items-center px-3 py-2 hover:text-black transition-all duration-100 w-full text-left hover:bg-primary-main"
-                      >
-                        <Edit size={10} className="text-gray-600" /> Edit
-                      </button>
-                    </Menu.Item>
-                  </Menu.Items>
-                </Menu>
-              </div>
-              {provided.placeholder}
-            </div>
-          );
-        }}
-      </Droppable>
+                <Trash size={10} className="text-gray-600" /> Delete
+              </button>
+            </Menu.Item>
+            <Menu.Item>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setGroupToEdit(group.group);
+                }}
+                className="flex gap-2 items-center px-3 py-2 hover:text-black transition-all duration-100 w-full text-left hover:bg-primary-main"
+              >
+                <Edit size={10} className="text-gray-600" /> Edit
+              </button>
+            </Menu.Item>
+          </Menu.Items>
+        </Menu>
+      </div>
       {subgroupOpen && group.subgroups.length > 0 && (
         <ul className="flex flex-col gap-2 mt-2">
           {group.subgroups.map((group, idx) => (
             <li key={group.group.$id} className="pl-4">
               <Group
+                setResumes={setResumes}
                 resumeGroupFilter={resumeGroupFilter}
                 setResumeGroupFilter={setResumeGroupFilter}
                 group={group}
