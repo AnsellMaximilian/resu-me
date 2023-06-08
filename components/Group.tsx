@@ -50,7 +50,7 @@ export default function Group({
       drop: async (item, monitor) => {
         const groupId = group.group.$id;
         const draggedResume = monitor.getItem() as Resume;
-        const resume = await updateResume(draggedResume.$id, { groupId: null });
+        const resume = await updateResume(draggedResume.$id, { groupId });
 
         setResumeGroupFilter(groupId);
         setResumes((prev) =>
