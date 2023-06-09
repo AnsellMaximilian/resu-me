@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import Spinner from "./Spinner";
 import { Group } from "./GroupList";
+import { getGroupChildren } from "@/helpers";
 
 export type SubmitFunction = (
   name: string,
@@ -47,7 +48,12 @@ export default function GroupForm({
 
   const filteredGroups = useMemo(() => {
     if (groupToEdit) {
-      return groups.filter((g) => g.$id !== groupToEdit.$id);
+      const children = getGroupChildren(groupToEdit, groups);
+      return groups.filter(
+        (g) =>
+          g.$id !== groupToEdit.$id &&
+          !children.some((child) => child.$id === g.$id)
+      );
     }
     return groups;
   }, [groupToEdit, groups]);

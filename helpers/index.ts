@@ -44,3 +44,13 @@ export function getGroupParents(group: Group, groups: Group[]) {
   }
   return parents;
 }
+
+export function getGroupChildren(group: Group, groups: Group[]) {
+  const children: Group[] = [];
+  for (const g of groups) {
+    if (g.parentGroupId === group.$id) {
+      children.push(g, ...getGroupChildren(g, groups));
+    }
+  }
+  return children;
+}
