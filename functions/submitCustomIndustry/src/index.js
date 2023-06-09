@@ -48,7 +48,7 @@ module.exports = async function (req, res) {
     const customIndustry = await database.createDocument(
       req.variables["DATABASE_ID"],
       req.variables["INDUSTRY_COLLECTION_ID"],
-      name,
+      name.replace(/[^a-z0-9]/gi, "_").toLowerCase(),
       { name, approved: false }
     );
     res.json(customIndustry);
