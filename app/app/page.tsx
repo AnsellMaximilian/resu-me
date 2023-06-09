@@ -178,7 +178,7 @@ export default function AppPage() {
         process.env.NEXT_PUBLIC_BUCKET_ID as string,
         resumeId
       );
-      setResumes((prev) => prev.filter((res) => res.$id !== resumeId));
+      setFilteredResumes((prev) => prev.filter((res) => res.$id !== resumeId));
       toast.success(`Deleted resume of id ${resumeId}`);
       return true;
     } catch (error) {
