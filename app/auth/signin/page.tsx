@@ -7,12 +7,16 @@ import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import { AiOutlineLoading3Quarters as Spinner } from "react-icons/ai";
 import Link from "next/link";
+import useAuth from "@/hooks/useAuth";
 
 const SignUpPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { currentAccount } = useAuth();
+
+  if (currentAccount) router.push("/app");
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
