@@ -1,6 +1,6 @@
 import appwriteClient, { account, teams } from "@/libs/appwrite";
 import { Models } from "appwrite";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 export type UserObject = Models.User<Models.Preferences> & {
   isAdmin: boolean;
@@ -11,6 +11,7 @@ export default function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
 
   const router = useRouter();
+  const pathname = usePathname();
 
   const getSession = async () => {
     try {
@@ -33,7 +34,9 @@ export default function useAuth() {
       setCurrentAccount(userObject);
     } catch (error) {
       console.log(error);
-      router.push("/auth/signin");
+      if (!["/auth/signin", "/auth/signup"].includes(pathname)) {
+        router.push("/auth/signin");
+      }
     } finally {
       setIsLoading(false);
     }
